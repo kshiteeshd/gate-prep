@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% import "_m.html" as m %}
+{% block title %}GATE mocks · GATE Prep{% endblock %}
+{% block body %}
+<div class="row sp wrap"><div><h1 class="h1">Full GATE CS mocks</h1><p class="muted" style="margin:4px 0 0">All subjects together, in real GATE weightage. 30 papers.</p></div>
+  <div class="chip">Overall Level {{ snap.overall.level }}</div></div>
+<div class="note" style="margin:20px 0"><b>65 questions · 180 minutes · 100 marks</b> — 10 General Aptitude + 55 Computer Science, mixed MCQ / MSQ / NAT. Negative marking ⅓ (1 mark) and ⅔ (2 marks) for MCQ only. Mocks unlock as your <b>overall level</b> rises.</div>
+<div class="grid gauto">{% for t in full %}{{ m.tcard(t) }}{% endfor %}</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}{% import "_m.html" as m %}
+{% block title %}Settings · GATE Prep{% endblock %}
+{% block body %}
+{% set THEMES = [('paper','Paper','Warm white, the default',['#fbfaf7','#1c1b19','#1f4fd8']),('sepia','Sepia','Easy on the eyes for long reading',['#f4ecd8','#3b2f1e','#8a4b12']),('mist','Mist','Cool grey-blue',['#f3f6fa','#17202e','#0b63ce']),('forest','Forest','Soft green',['#f3f7f1','#1b2a1d','#1d7a4a']),('slate','Slate','Dark, neutral',['#1b1f27','#e6e9ef','#5b86f5']),('midnight','Midnight','Dark, deep blue',['#0d1220','#e4e9fb','#6a6df0'])] %}
+<h1 class="h1">Settings</h1>
+<div class="set">
+ <section class="setsec"><div><h2>Theme</h2><p>Applies instantly and is remembered. <span class="kbd">Alt</span> <span class="kbd">T</span> cycles through them.</p></div>
+  <div class="themes">{% for k,n,d,c in THEMES %}<button type="button" class="theme {{ 'on' if ui.theme==k }}" data-ui="theme" data-v="{{ k }}"><span class="sw">{% for x in c %}<i style="background:{{ x }}"></i>{% endfor %}</span><b>{{ n }}</b><small>{{ d }}</small></button>{% endfor %}</div></section>
+ <section class="setsec"><div><h2>Layout</h2><p>Text size and spacing. Collapse the sidebar with <span class="kbd">Ctrl</span> <span class="kbd">B</span> to give pages more room.</p></div>
+  <div class="ctl">
+   <div><label class="f">Text size</label><div class="seg">{% for k,n in [('sm','Small'),('md','Default'),('lg','Large'),('xl','Extra large')] %}<button type="button" data-ui="size" data-v="{{ k }}" class="{{ 'on' if ui.size==k }}">{{ n }}</button>{% endfor %}</div></div>
+   <div><label class="f">Spacing</label><div class="seg">{% for k,n in [('comfortable','Comfortable'),('compact','Compact')] %}<button type="button" data-ui="density" data-v="{{ k }}" class="{{ 'on' if ui.density==k }}">{{ n }}</button>{% endfor %}</div></div>
+   <div><label class="f">Sidebar</label><button type="button" class="btn sm" data-ui="side">Collapse / expand</button></div>
+  </div></section>
+ <section class="setsec"><div><h2>Window</h2><p>Full screen hides the title bar for distraction-free study.</p></div>
+  <div class="ctl"><div class="row" style="gap:10px;flex-wrap:wrap"><button type="button" class="btn" data-ui="fullscreen">Toggle full screen <span class="kbd">F11</span></button><button type="button" class="btn" data-ui="help">Keyboard shortcuts <span class="kbd">?</span></button><button type="button" class="btn" data-ui="exit">Exit app <span class="kbd">Ctrl Q</span></button></div></div></section>
+ <form method="post">
+ <section class="setsec"><div><h2>Study</h2></div>
+  <div class="ctl">
+   <div><label class="f">Daily goal (questions)</label><input type="number" name="daily_goal" value="{{ daily_goal }}" min="5" max="500" style="width:120px"></div>
+   <label class="ck"><input type="checkbox" name="strict" {{ 'checked' if strict }}><span>Strict exam mode<small>Locks a test to full screen and records a violation when you leave it (5 violations auto-submit). Off by default — it's your own machine.</small></span></label>
+  </div></section>
+ <section class="setsec"><div><h2>Updates</h2><p>Version <b>{{ APP_VERSION }}</b></p></div>
+  <div class="ctl">
+   <label class="ck"><input type="checkbox" name="auto_update" {{ 'checked' if auto_update }}><span>Check for updates automatically</span></label>
+   <div><label class="f">Update feed URL (HTTPS, latest.json)</label><input type="text" name="update_feed" value="{{ feed }}" placeholder="https://…/latest.json" style="width:100%">
+    {% if ustate.error %}<p class="hint">Last check didn't work — you may be offline, or the feed address above isn't set up yet.</p>{% endif %}</div>
+   <div class="row" style="gap:10px"><button class="btn pri">Save settings</button><button class="btn" formaction="/update/check">Check for updates now</button></div>
+  </div></section>
+ </form>
+ <section class="setsec"><div><h2>Your data</h2><p>Everything lives in one local file, outside the app folder, so updates never touch it.</p></div>
+  <div class="ctl"><div class="mono small muted" style="word-break:break-all">{{ db_path }}</div>
+   <div><a class="btn" href="/settings/backup">{{ m.ic('upload') }} Download backup</a></div>
+   <form method="post" action="/settings/reset"><b style="color:var(--bad)">Reset progress</b><p class="hint">Clears attempts, credits and levels. Questions and tests stay. Type RESET to confirm.</p>
+    <div class="row" style="margin-top:8px"><input type="text" name="confirm" placeholder="RESET" style="width:160px"><button class="btn">Reset</button></div></form></div></section>
+</div>
+{% endblock %}

@@ -1,0 +1,233 @@
+/* GATE Prep — "paper" skin: light only, flat, typographic. Loaded last; removes boxes, shadows and gradients. */
+:root,[data-theme=dark],[data-theme=light]{
+  --bg:#fbfaf7;--bg2:#f4f2ec;--card:transparent;--card2:#f4f2ec;--line:#e6e2d8;--line2:#d4cfc2;
+  --txt:#1c1b19;--mut:#64605a;--mut2:#8f8a80;--acc:#1f4fd8;--acc2:#1f4fd8;--grad:none;
+  --easy:#1a7f4b;--med:#a86a00;--hard:#b3261e;--ok:#1a7f4b;--bad:#b3261e;--shadow:none;--glow:none;color-scheme:light}
+html,body{background:var(--bg)!important;background-image:none!important;color:var(--txt)}
+body{font:15px/1.6 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif}
+#themeBtn,#themeX,#themeP{display:none!important}
+a{color:inherit}
+.main a:not(.btn):not(.nav a):hover{color:var(--acc)}
+
+/* ---------- global de-boxing ---------- */
+.card,.trow,.tli,.lvlcard,.subj,.hero,.lhero,.outline,.callout,.formula,.analogy,.stat,.chip,.tag,.pill,.badge,details,.q,.opt,.pal,.nav a,.iconbtn,.timer{
+  box-shadow:none!important;background-image:none!important}
+.card,.lvlcard,.subj,.trow,.tli,.hero,.lhero,.stat{background:transparent!important;border:0!important;border-radius:0!important}
+.card{padding:0;margin:0}
+.grid{gap:0 36px}
+
+/* ---------- shell ---------- */
+.side{background:var(--bg2);border-right:1px solid var(--line)}
+.logo b,.xlogo b{background:none;border:0;color:var(--acc);font:700 1.25rem "Cascadia Mono","Cascadia Code",Consolas,"Courier New",monospace;width:auto;height:auto}
+.logo{font-family:"Cascadia Mono","Cascadia Code",Consolas,"Courier New",monospace;font-weight:700}
+.logo small{font-family:"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;letter-spacing:.14em}
+.nav a{border-radius:0;padding:8px 10px;color:var(--mut);font-weight:500;background:none!important;box-shadow:none!important}
+.nav a:hover{color:var(--txt)}
+.nav a.on{color:var(--acc);font-weight:600;box-shadow:inset 2px 0 0 var(--acc)!important}
+.nav .sec{font-family:"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;letter-spacing:.14em;color:var(--mut2)}
+.top{background:var(--bg)!important}
+.chip,.pill{background:none!important;border:0!important;border-radius:0;padding:0 10px 0 0;color:var(--mut);font-family:inherit;font-weight:600}
+.pill{padding:2px 12px 2px 0;display:inline-block}
+.pill.y{color:var(--ok)}.pill.n{color:var(--bad)}
+.tag{background:none!important;border:0!important;border-radius:0;padding:0;font-family:"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.tag.easy{color:var(--easy)}.tag.medium{color:var(--med)}.tag.hard{color:var(--hard)}
+.iconbtn{background:none;border:0;color:var(--mut)}
+.iconbtn:hover{color:var(--acc)}
+.crumbs{font-family:"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;font-size:.8rem;color:var(--mut);letter-spacing:.02em}
+
+/* ---------- headings ---------- */
+.h1,h1{font-family:"Cascadia Mono","Cascadia Code",Consolas,"Courier New",monospace;font-weight:700;letter-spacing:-.015em}
+.h2,h2{font-family:"Cascadia Mono","Cascadia Code",Consolas,"Courier New",monospace;font-weight:700}
+.sech{border-bottom:1px solid var(--line);padding-bottom:8px;margin:44px 0 16px}
+
+/* ---------- buttons & inputs ---------- */
+.btn{background:none;border:1px solid var(--line2);border-radius:3px;color:var(--txt);font-weight:600;box-shadow:none;padding:7px 14px}
+.btn:hover{border-color:var(--acc);color:var(--acc);background:none;transform:none}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff!important}
+.btn.pri:hover{background:var(--acch);border-color:var(--acch)}
+.btn.sm{padding:4px 10px}
+input[type=text],input[type=number],input[type=search],select,textarea{background:transparent!important;border:0!important;border-bottom:1px solid var(--line2)!important;border-radius:0!important;color:var(--txt);padding:5px 2px}
+input:focus,select:focus,textarea:focus{outline:none;border-bottom-color:var(--acc)!important}
+textarea{border:1px solid var(--line2)!important;border-radius:3px!important;padding:8px}
+.bar{background:var(--line);height:3px;border-radius:0}.bar>i{background:var(--acc);border-radius:0}
+.ring::before{background:var(--bg)}
+.badge{background:none!important;border:0;color:var(--acc)}
+
+/* ---------- lists become ruled rows ---------- */
+.subj,.trow,.tli{border-bottom:1px solid var(--line)!important;padding:14px 0!important}
+.subj:hover,.trow:hover,.tli:hover{background:var(--bg2)!important;transform:none}
+table,.tt,.rt,table.t{border-collapse:collapse}
+th{font-family:"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;letter-spacing:.08em;color:var(--mut);background:none!important;border-bottom:1px solid var(--line2)}
+td{border-bottom:1px solid var(--line)}
+th,td{border-left:0!important;border-right:0!important}
+
+/* ---------- lesson page ---------- */
+.lwrap{gap:56px}
+.lhero{padding:6px 0 26px!important;border-bottom:1px solid var(--line)!important;color:var(--txt)!important}
+.lhero h1{color:var(--txt)!important;font-size:2.3rem;line-height:1.15;margin:10px 0 10px}
+.lhero .sub{color:var(--mut)!important;font-family:"Cascadia Mono","Cascadia Code",Consolas,"Courier New",monospace;font-size:1.12rem;line-height:1.6;max-width:62ch;opacity:1}
+.lhero .tag{color:var(--acc)!important}
+.lhero .meta{display:flex;gap:22px;margin-top:14px;flex-wrap:wrap}
+.lhero .meta span{background:none!important;border:0!important;padding:0;color:var(--mut)!important;font-size:.82rem}
+.lhero .btn{background:none!important;color:var(--mut)!important;border:0!important;padding:0}
+.outline{border-bottom:1px solid var(--line)!important;padding:14px 0!important}
+.sec{padding-top:34px;border-top:0}
+.sec>*:not(.sh){max-width:70ch}
+.sec .wgt,.sec table,.sec .formula,.sec .grid{max-width:none}
+.sec p,.sec li{font-family:"Cascadia Mono","Cascadia Code",Consolas,"Courier New",monospace;font-size:1.04rem;line-height:1.78}
+.sec table p,.sec table li{font-family:inherit;font-size:.92rem}
+.sh{margin-bottom:12px}
+.sh .num{background:none!important;border:0!important;color:var(--mut2);font:600 .95rem "Cascadia Mono","Cascadia Code",Consolas,"Courier New",monospace;width:auto;height:auto;border-radius:0}
+.sh h2{font-size:1.5rem}
+.callout{background:none!important;border:0!important;border-left:3px solid var(--line2)!important;border-radius:0!important;padding:4px 0 4px 16px!important;margin:18px 0}
+.callout.key{border-left-color:var(--acc)!important}
+.callout.tip{border-left-color:var(--ok)!important}
+.callout.warn,.callout.trap{border-left-color:var(--hard)!important}
+.callout .ic{display:none}
+.callout .t{display:block;font-family:"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:2px}
+.callout.key .t{color:var(--acc)}.callout.tip .t{color:var(--ok)}.callout.warn .t,.callout.trap .t{color:var(--hard)}
+.formula{background:none!important;border:0!important;border-top:1px solid var(--line)!important;border-bottom:1px solid var(--line)!important;border-radius:0!important;padding:12px 0;margin:16px 0;font-family:"Cascadia Mono","Cascadia Code",Consolas,"Courier New",monospace;font-size:1.1rem;display:flex;gap:18px;align-items:baseline;flex-wrap:wrap}
+.formula small{font-family:"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;font-size:.78rem;color:var(--mut)}
+.analogy{display:flex;gap:14px;padding:6px 0!important;font-style:italic}
+.analogy .em{filter:none;font-size:1.5rem}
+code{background:var(--bg2);border-radius:2px;padding:1px 5px}
+pre{background:var(--bg2)!important;border:0!important;border-radius:0!important;border-left:3px solid var(--line2)!important}
+details{border:0!important;border-top:1px solid var(--line)!important;border-radius:0!important;background:none!important}
+summary{color:var(--acc);font-weight:600}
+details .bd{border:0!important;background:none!important}
+.steps li::before{background:none!important;border:0!important;color:var(--acc);font-weight:700}
+.steps li{background:none!important;border:0!important;border-radius:0}
+.toc a{border-radius:0}
+.toc a.on,.toc a.cur{color:var(--acc);box-shadow:inset 2px 0 0 var(--acc);background:none}
+
+/* examples: ruled, not boxed */
+#s-ex>.card{border-top:1px solid var(--line)!important;padding:18px 0!important;margin:0!important}
+.q{background:none!important;border:0!important;border-top:1px solid var(--line)!important;border-radius:0!important;padding:20px 0!important;margin:0!important}
+.opt{background:none!important;border:0!important;border-radius:0!important;border-bottom:1px solid var(--line)!important;padding:9px 6px;text-align:left}
+.opt:hover{background:var(--bg2)!important}
+.opt .k{background:none!important;border:0!important;color:var(--mut);font-weight:700}
+.opt.sel{background:var(--selbg)!important}
+.opt.right{background:var(--okbg)!important;color:var(--ok)}
+.opt.bad{background:var(--badbg)!important;color:var(--bad)}
+.fb{border-radius:0}
+.fb.ok{border-left:3px solid var(--ok);background:none}
+
+/* interactive tools: a quiet ruled band, no box */
+.wgt{background:none!important;border:0!important;border-top:1px solid var(--line2)!important;border-bottom:1px solid var(--line2)!important;border-radius:0!important;padding:18px 0!important}
+.wgt .out{background:none!important;border:0!important;padding:6px 0}
+svg.gsvg,canvas.cv{background:none!important;border:0!important}
+.wgt .btn.sm{border-color:var(--line2)}
+
+/* exam */
+.xbar,.xtop{background:var(--bg)!important;border-bottom:1px solid var(--line)}
+.timer{background:none!important;border:0!important;color:var(--acc);font-family:"Cascadia Mono","Cascadia Code",Consolas,"Courier New",monospace;font-size:1.2rem}
+.timer.low{color:var(--bad)}
+.pal{background:none!important;border:1px solid var(--line2)!important;border-radius:3px!important}
+.pal.cur{border-color:var(--acc)!important;color:var(--acc)}
+.pal.ans{background:var(--okbg)!important}.pal.mark{background:var(--warnbg)!important}
+
+/* dashboard hero & stats */
+.hero{padding:10px 0 22px!important;border-bottom:1px solid var(--line)!important;color:var(--txt)!important}
+.hero .stat{border:0;border-left:1px solid var(--line)!important;padding-left:14px;color:var(--txt)}
+.hero .stat span{color:var(--mut)!important}
+.hero .tag{color:var(--acc)!important}
+::selection{background:var(--selection)}
+
+/* dashboard subject list: ruled rows */
+.gauto{display:grid;grid-template-columns:repeat(auto-fill,minmax(430px,1fr));gap:0 56px}
+.scard{display:grid!important;grid-template-columns:1fr auto;gap:2px 16px!important;padding:16px 0!important;border-bottom:1px solid var(--line)!important;transition:none!important}
+.scard:hover{transform:none!important;background:var(--bg2)!important}
+.scard .bar{display:none}
+.scard .kv{display:flex;gap:18px;grid-column:1/-1;font-size:.78rem;color:var(--mut)}
+.scard .kv div{display:flex;gap:5px;align-items:baseline}
+.scard .kv b{font-size:.9rem;color:var(--txt)}
+.scard .nm{font-family:"Cascadia Mono","Cascadia Code",Consolas,"Courier New",monospace;font-size:1.1rem}
+.scard .badge{font-size:1.1rem;width:30px}
+.g3{gap:0 40px}
+.g2{gap:0 40px}
+.grid>.card.flat{border-bottom:1px solid var(--line)!important;padding:12px 0!important}
+
+/* subject page */
+.card[style*="gradient"]{background:none!important;border-bottom:1px solid var(--line)!important;padding-bottom:22px!important}
+.badge[style*="width:68px"]{font:700 1.6rem "Cascadia Mono","Cascadia Code",Consolas,"Courier New",monospace;border-radius:0!important}
+.choice{display:block!important;padding:10px 0 22px!important;border-top:1px solid var(--line2)!important;position:static!important;overflow:visible}
+.choice::before,.choice::after{display:none!important;content:none!important}
+.choice .ci{background:none!important;border:0!important;color:var(--acc);width:auto;height:auto;margin-bottom:6px}
+.choice .ci svg{width:22px;height:22px}
+.choice:hover{transform:none!important;background:none!important}
+.choice .btn.pri{background:none;color:var(--acc)!important;border:0;padding:0;font-weight:700}
+.choice .btn.pri:hover{background:none;text-decoration:underline}
+.choice .meta{display:flex;gap:18px;color:var(--mut);font-size:.82rem;margin-top:10px}
+.main .grid a.card .btn.pri{background:none!important;color:var(--acc)!important;border:0!important;padding:4px 0!important;justify-content:flex-start;font-weight:700;width:auto}
+.main .grid a.card .btn.pri:hover{text-decoration:underline;background:none!important}
+.main .grid>.card{border-top:1px solid var(--line)!important;padding:14px 0!important}
+
+/* exam */
+.pcard,.palette,.bootcard,.calc{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+.palette{border-left:1px solid var(--line)!important;padding-left:18px}
+.pcard{padding-left:0;padding-right:0}
+.xb{background:none!important;border:0!important;color:var(--mut);border-radius:0}
+.xb:hover{color:var(--acc)}
+.psec{background:none!important;color:var(--mut)!important;border-bottom:1px solid var(--line);border-radius:0;letter-spacing:.1em;text-transform:uppercase}
+.pcount{background:none!important;border-radius:0}
+.fb{border-radius:0!important;border:0!important;border-left:3px solid var(--line2)!important;background:none!important}
+.fb.ok{border-left-color:var(--ok)!important}.fb.bad{border-left-color:var(--bad)!important}
+body.x-practice,body.x-exam,.bootwrap{background:var(--bg)!important}
+.nat{border:0!important;border-bottom:2px solid var(--line2)!important;border-radius:0!important;background:none!important}
+.calc{border:1px solid var(--line2)!important;background:var(--bg)!important;box-shadow:0 6px 24px rgba(0,0,0,.12)!important}
+
+/* type system: one monospace (as in the SQL results) for headings, labels, data, formulas; one clean sans for reading */
+:root{--mono:"Cascadia Mono","Cascadia Code",Consolas,"Courier New",monospace;--sans:"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif}
+body,.sec p,.sec li,.lhero .sub,.analogy{font-family:var(--sans)!important;font-style:normal}
+.sec p,.sec li{font-size:1rem;line-height:1.75}
+.lhero .sub{font-size:1.05rem}
+h1,h2,.h1,.h2,.scard .nm,.logo,.sh h2{font-family:var(--mono)!important;letter-spacing:-.02em;font-weight:700}
+.lhero h1{font-size:2rem}.sh h2{font-size:1.25rem}.h1{font-size:1.7rem}
+.formula,code,pre,.tt,.rt,.kv b,.pill,.timer,.opt .k,.pal,.nat,.wgt table,.wgt .out,textarea,input[type=text],input[type=number]{font-family:var(--mono)!important}
+.crumbs,.tag,.callout .t,.nav .sec,th,.meta,.logo small{font-family:var(--mono)!important;letter-spacing:.04em}
+.nav a,.btn{font-family:var(--sans)}
+
+/* proofs & notes */
+.deep{margin:22px 0;max-width:70ch}
+.deep h3{font-family:var(--mono);font-size:1rem;margin:0 0 6px;color:var(--txt);letter-spacing:-.01em}
+.deep h3::before{content:"∎ ";color:var(--acc)}
+#s-notes .deep h3::before{content:"› "}
+
+/* ---------- navigation: where am I ---------- */
+.side{overflow-y:auto;padding-bottom:14px}
+.nav .nsec{font:600 .68rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mut2);padding:16px 10px 5px}
+.nav a.sj{padding:5px 10px;font-size:.86rem;gap:10px}
+.nav a.sj .cd{font:600 .7rem var(--mono);width:40px;flex:none;color:var(--mut2)}
+.nav a.sj.on .cd{color:var(--acc)}
+.nav a.on{background:var(--accbg)!important;color:var(--acc)!important;font-weight:700;box-shadow:inset 3px 0 0 var(--acc)!important}
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;padding:0 28px!important;height:46px;box-sizing:border-box;border-bottom:1px solid var(--line)}
+.crumbs{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;font-size:.78rem!important;margin:0!important}
+.crumbs i{font-style:normal;color:var(--mut2)}
+.crumbs a{color:var(--mut)}.crumbs a:hover{color:var(--acc);text-decoration:underline}
+.crumbs b{color:var(--txt);font-weight:700;max-width:46ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.backbtn{font:600 .8rem var(--mono);background:none;border:1px solid var(--line2);color:var(--txt);padding:5px 12px;border-radius:3px;cursor:pointer;flex:none}
+.backbtn:hover{border-color:var(--acc);color:var(--acc)}
+.subnav{display:flex;align-items:center;gap:4px;padding:0 28px;border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:46px;z-index:19}
+.subnav .who{font:700 .85rem var(--mono);margin-right:18px;padding:11px 0;border-left:3px solid var(--c);padding-left:10px}
+.subnav a{padding:11px 16px;font-weight:600;font-size:.88rem;color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-1px}
+.subnav a:hover{color:var(--txt)}
+.subnav a.on{color:var(--acc);border-bottom-color:var(--acc)}
+@media(max-width:900px){.subnav{overflow-x:auto}.top{padding:9px 14px!important}}
+
+/* ---------- typeset maths ---------- */
+.formula{display:block!important;text-align:center;padding:16px 0!important}
+.formula .texd{margin:2px 0}
+.formula small{display:block;margin-top:2px}
+.texd{margin:14px 0;overflow-x:auto;overflow-y:hidden;text-align:center;font-size:1.12em}
+.texd.done{padding:2px 0}
+.tex{font-size:1.04em}
+.katex{font-family:KaTeX_Main,"Times New Roman",serif}
+
+/* ---------- textbook chapter ---------- */
+.book{max-width:72ch}
+.book h3.bk{font:700 1.12rem var(--mono);margin:34px 0 8px;letter-spacing:-.01em;padding-top:6px;border-top:1px solid var(--line)}
+.book p,.book li{font-size:1.04rem;line-height:1.85}
+.book p{margin:0 0 14px}
+.book ul,.book ol{margin:4px 0 16px 22px}
+.book .texd{text-align:left;margin:16px 0 16px 18px}
+.book table{margin:14px 0}

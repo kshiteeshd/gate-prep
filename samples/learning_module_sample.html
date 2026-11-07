@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Learn · Round Robin Scheduling — GATE Prep (design sample)</title>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('gp-theme')||'dark'}catch(e){}</script>
+<style>
+:root,[data-theme=dark]{--bg:#0a0f1f;--bg2:#0d1428;--card:#121a35;--card2:#18224a;--line:#222d57;--line2:#2c3a6b;--txt:#e9edfb;--mut:#8d99bb;--mut2:#66719a;--acc:#7c5cff;--acc2:#38bdf8;--grad:linear-gradient(135deg,#7c5cff 0%,#4f7bff 55%,#38bdf8 100%);--easy:#34d399;--med:#fbbf24;--hard:#fb7185;--ok:#34d399;--bad:#fb7185;--shadow:0 10px 30px rgba(0,0,0,.35);--glow:0 0 0 1px rgba(124,92,255,.35),0 8px 28px rgba(124,92,255,.25);--code:#0a1022;color-scheme:dark}
+[data-theme=light]{--bg:#f2f4fb;--bg2:#e9edf8;--card:#fff;--card2:#f6f8fe;--line:#e0e5f2;--line2:#cdd5ea;--txt:#141a36;--mut:#5d6a93;--mut2:#8a95b8;--acc:#6a47f5;--acc2:#0ea5e9;--easy:#10b981;--med:#d97706;--hard:#e11d48;--ok:#059669;--bad:#e11d48;--shadow:0 8px 24px rgba(30,40,90,.10);--glow:0 0 0 1px rgba(106,71,245,.3),0 8px 24px rgba(106,71,245,.18);--code:#f1f4fb;color-scheme:light}
+*{box-sizing:border-box}html,body{margin:0}html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font:16px/1.65 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}h1,h2,h3,h4{margin:0;letter-spacing:-.01em}p{margin:0 0 12px}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.muted{color:var(--mut)}.small{font-size:.84rem}.mono{font-family:Consolas,"Cascadia Mono",monospace}
+.row{display:flex;align-items:center;gap:12px}.sp{justify-content:space-between}.wrap{flex-wrap:wrap}.grow{flex:1;min-width:0}
+/* shell */
+.app{display:grid;grid-template-columns:292px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;overflow:auto;background:var(--bg2);border-right:1px solid var(--line);padding:16px 14px 30px}
+.logo{display:flex;align-items:center;gap:11px;padding:4px 8px 14px;font-weight:800;font-size:1.1rem}
+.logo b{width:34px;height:34px;border-radius:10px;background:var(--grad);display:grid;place-items:center;color:#fff;font-size:.85rem;box-shadow:var(--glow)}
+.logo small{display:block;font-size:.66rem;font-weight:700;letter-spacing:.14em;color:var(--mut);text-transform:uppercase}
+.subj{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;background:var(--card);border:1px solid var(--line);cursor:pointer;margin-bottom:12px}
+.subj:hover{border-color:var(--acc)}
+.badge{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff;font-weight:800;background:var(--c,#3b82f6);flex:none}
+.ring{--p:0;--c:var(--acc);--s:44px;width:var(--s);height:var(--s);border-radius:50%;background:conic-gradient(var(--c) calc(var(--p)*1%),var(--bg2) 0);display:grid;place-items:center;position:relative;flex:none;font-size:.72rem;font-weight:800}
+.ring::before{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--card)}.ring>*{position:relative}
+.chap{margin-bottom:6px}
+.chap>button{width:100%;display:flex;align-items:center;gap:10px;background:none;border:0;color:var(--txt);font:inherit;font-weight:700;padding:9px 10px;border-radius:10px;cursor:pointer;text-align:left}
+.chap>button:hover{background:var(--card)}
+.chap .n{width:24px;height:24px;border-radius:8px;background:var(--card2);display:grid;place-items:center;font-size:.75rem;color:var(--mut)}
+.chap.open .n{background:var(--acc);color:#fff}
+.chap .tl{display:none;margin:2px 0 8px 22px;border-left:2px solid var(--line);padding-left:6px}
+.chap.open .tl{display:block}
+.tl a{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:9px;color:var(--mut);font-size:.9rem;cursor:pointer}
+.tl a:hover{background:var(--card);color:var(--txt)}.tl a.cur{background:var(--card2);color:var(--txt);box-shadow:inset 3px 0 0 var(--acc);font-weight:700}
+.dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--line2);flex:none;display:grid;place-items:center}
+.dot.done{background:var(--ok);border-color:var(--ok)}.dot.done svg{width:10px;height:10px;color:#04210f;stroke-width:3}
+.main{min-width:0}
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:12px;padding:12px 32px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.rbar{position:absolute;left:0;bottom:-1px;height:3px;background:var(--grad);width:0}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-weight:700;font-size:.85rem}
+.iconbtn{width:38px;height:38px;border-radius:11px;background:var(--card);border:1px solid var(--line);color:var(--txt);display:grid;place-items:center;cursor:pointer}.iconbtn:hover{border-color:var(--acc)}
+.crumbs{font-size:.86rem;color:var(--mut)}.crumbs a{cursor:pointer}.crumbs a:hover{color:var(--txt)}
+.wrapper{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:34px;max-width:1180px;margin:0 auto;padding:26px 32px 90px}
+@media(max-width:1280px){.wrapper{grid-template-columns:minmax(0,1fr)}.toc{display:none}}
+@media(max-width:900px){.app{grid-template-columns:1fr}.side{display:none}.top,.wrapper{padding-left:16px;padding-right:16px}}
+.toc{position:sticky;top:78px;align-self:start;font-size:.88rem}
+.toc h4{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mut2);margin-bottom:10px}
+.toc a{display:block;padding:6px 12px;border-left:2px solid var(--line);color:var(--mut);cursor:pointer}.toc a:hover{color:var(--txt)}.toc a.on{border-color:var(--acc);color:var(--txt);font-weight:700}
+/* surfaces */
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;border-radius:12px;border:1px solid var(--line2);background:var(--card2);color:var(--txt);font:inherit;font-weight:700;cursor:pointer;transition:.15s}
+.btn:hover{border-color:var(--acc);transform:translateY(-1px)}.btn.pri{background:var(--grad);border:0;color:#fff;box-shadow:var(--glow)}.btn.sm{padding:6px 12px;font-size:.84rem;border-radius:10px}.btn[disabled]{opacity:.45;pointer-events:none}
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:var(--card2);color:var(--mut)}
+.tag.easy{background:rgba(52,211,153,.14);color:var(--easy)}.tag.medium{background:rgba(251,191,36,.14);color:var(--med)}.tag.hard{background:rgba(251,113,133,.14);color:var(--hard)}
+.bar{height:8px;border-radius:99px;background:var(--bg2);overflow:hidden}.bar>i{display:block;height:100%;background:var(--grad);border-radius:99px;transition:width .5s}
+.grid{display:grid;gap:16px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.gauto{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+@media(max-width:760px){.g2,.g3{grid-template-columns:1fr}}
+.view{display:none}.view.on{display:block}
+/* topic hero */
+.hero{border-radius:24px;padding:28px 30px;color:#fff;background:radial-gradient(800px 260px at 90% -30%,rgba(56,189,248,.4),transparent),radial-gradient(600px 260px at 0% 130%,rgba(124,92,255,.55),transparent),linear-gradient(135deg,#1a2352,#10173a);border:1px solid var(--line2)}
+[data-theme=light] .hero{background:radial-gradient(800px 260px at 90% -30%,rgba(56,189,248,.5),transparent),linear-gradient(135deg,#5b46e8,#3b6cf0)}
+.hero h1{font-size:2.1rem;font-weight:850;letter-spacing:-.025em;margin:8px 0 6px}
+.hero .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.hero .meta span{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);padding:5px 12px;border-radius:99px;font-size:.82rem;font-weight:600}
+/* sections */
+.sec{margin-top:42px;scroll-margin-top:84px}
+.sh{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.sh .num{width:34px;height:34px;border-radius:11px;background:var(--grad);color:#fff;display:grid;place-items:center;font-weight:800;box-shadow:var(--glow)}
+.sh h2{font-size:1.45rem;font-weight:800}
+.lead{font-size:1.1rem;color:var(--txt)}
+.callout{display:flex;gap:14px;padding:16px 18px;border-radius:16px;border:1px solid;margin:16px 0}
+.callout .ic{font-size:1.3rem;line-height:1.2}
+.callout.key{background:rgba(124,92,255,.1);border-color:rgba(124,92,255,.4)}
+.callout.tip{background:rgba(52,211,153,.09);border-color:rgba(52,211,153,.35)}
+.callout.warn{background:rgba(251,191,36,.09);border-color:rgba(251,191,36,.4)}
+.callout.trap{background:rgba(251,113,133,.09);border-color:rgba(251,113,133,.4)}
+.callout b.t{display:block;margin-bottom:2px}
+code{font-family:Consolas,"Cascadia Mono",monospace;background:var(--code);padding:1px 7px;border-radius:7px;font-size:.92em}
+.formula{font:700 1.05rem Consolas,monospace;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:12px 16px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.formula small{font:500 .78rem "Segoe UI",sans-serif;color:var(--mut)}
+.analogy{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+.analogy .em{font-size:3rem}
+.steps{counter-reset:s;display:grid;gap:10px;padding:0;list-style:none;margin:12px 0}
+.steps li{counter-increment:s;display:flex;gap:14px;align-items:flex-start;background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.steps li::before{content:counter(s);flex:none;width:28px;height:28px;border-radius:50%;background:var(--acc);color:#fff;font-weight:800;display:grid;place-items:center;font-size:.85rem}
+details{border:1px solid var(--line);border-radius:14px;background:var(--card);margin:10px 0;overflow:hidden}
+summary{cursor:pointer;padding:13px 18px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}summary::after{content:"＋";color:var(--acc);font-weight:900}details[open] summary::after{content:"−"}
+details .bd{padding:0 18px 16px;color:var(--txt)}
+/* simulator */
+.sim{padding:0;overflow:hidden}
+.sim .hd{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.sim .bd{padding:20px 22px}
+table.pt{border-collapse:collapse;width:100%;max-width:460px}
+.pt th{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);text-align:left;padding:4px 8px}
+.pt td{padding:4px 8px}.pt input{width:70px;background:var(--bg2);border:1px solid var(--line2);color:var(--txt);border-radius:9px;padding:6px 8px;font:inherit}
+.pp{display:inline-flex;align-items:center;gap:8px;font-weight:800}.pp i{width:14px;height:14px;border-radius:4px;background:var(--c)}
+input[type=range]{accent-color:var(--acc);width:200px}
+.stage{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:stretch;margin:18px 0}
+@media(max-width:700px){.stage{grid-template-columns:1fr}}
+.cpu{border:2px dashed var(--line2);border-radius:16px;padding:12px;text-align:center;min-height:96px;display:grid;place-items:center;align-content:center;gap:4px}
+.cpu .who{font-size:1.9rem;font-weight:900}.cpu small{color:var(--mut)}
+.rq{border:1px solid var(--line);background:var(--bg2);border-radius:16px;padding:12px 14px;min-height:96px}
+.rq .lab{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mut2);margin-bottom:8px;display:flex;justify-content:space-between}
+.qs{display:flex;gap:8px;flex-wrap:wrap}
+.qchip{min-width:48px;padding:8px 12px;border-radius:10px;color:#04121f;font-weight:800;text-align:center;animation:pop .3s}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.gantt{display:flex;gap:2px;overflow-x:auto;padding:6px 0 22px}
+.gc{flex:none;width:30px;height:38px;border-radius:7px;display:grid;place-items:center;font-size:.72rem;font-weight:800;color:#04121f;position:relative;background:var(--bg2);color:var(--mut2)}
+.gc::after{content:attr(data-t);position:absolute;top:100%;left:0;transform:translateX(-30%);font-size:.65rem;color:var(--mut2);font-weight:600;margin-top:2px}
+.gc.now{outline:3px solid var(--acc2);outline-offset:1px}
+.res{margin-top:14px;overflow-x:auto}
+table.rt{border-collapse:collapse;width:100%;min-width:480px}.rt th{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}.rt td{padding:9px 10px;border-bottom:1px solid var(--line)}
+.rt tfoot td{font-weight:800}
+.chart{display:flex;align-items:flex-end;gap:10px;height:130px;margin-top:10px}
+.chart .c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;font-size:.72rem;color:var(--mut)}
+.chart .c i{width:100%;max-width:38px;border-radius:7px 7px 0 0;background:var(--line2);transition:.3s;display:block}
+.chart .c.cur i{background:var(--grad)}.chart .c b{color:var(--txt);font-size:.75rem}
+.legend{display:flex;gap:16px;font-size:.8rem;color:var(--mut);margin-top:8px}
+/* practice */
+.q{margin:14px 0;padding:20px}
+.q .qh{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;margin:8px 0;cursor:pointer;background:var(--card2);width:100%;text-align:left;color:var(--txt);font:inherit}
+.opt:hover{border-color:var(--acc)}.opt .k{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--mut2);display:grid;place-items:center;font-size:.75rem;font-weight:800;color:var(--mut)}.opt.multi .k{border-radius:8px}
+.opt.sel{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 13%,var(--card2))}.opt.sel .k{background:var(--acc);border-color:var(--acc);color:#fff}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 13%,var(--card2))}.opt.right .k{background:var(--ok);border-color:var(--ok);color:#06231a}
+.opt.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--card2))}.opt.bad .k{background:var(--bad);border-color:var(--bad);color:#fff}.opt.lock{pointer-events:none}
+.nat{background:var(--bg2);border:1.5px solid var(--line2);color:var(--txt);border-radius:12px;padding:11px 14px;font:700 1.1rem Consolas,monospace;width:200px}
+.fb{margin-top:14px;border-radius:14px;padding:14px 16px;border:1.5px solid var(--line);display:none}.fb.on{display:block}
+.fb.ok{background:color-mix(in srgb,var(--ok) 10%,var(--card));border-color:var(--ok)}.fb.no{background:color-mix(in srgb,var(--bad) 9%,var(--card));border-color:var(--bad)}
+.fb .cr{float:right;color:#fbbf24;font-weight:800}
+.score{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+pre.tr{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:12px 16px;overflow:auto;font:.9rem/1.6 Consolas,monospace;margin:10px 0}
+/* overview pages */
+.chcard{display:flex;flex-direction:column;gap:12px;cursor:pointer;transition:.2s}.chcard:hover{transform:translateY(-3px);border-color:var(--acc)}
+.tli{display:flex;align-items:center;gap:14px;padding:14px 18px;border:1px solid var(--line);border-radius:14px;background:var(--card);margin-bottom:10px;cursor:pointer}.tli:hover{border-color:var(--acc);background:var(--card2)}
+.next{display:flex;justify-content:space-between;gap:14px;margin-top:40px;flex-wrap:wrap}
+#toast{position:fixed;left:50%;top:76px;transform:translateX(-50%);z-index:200;display:grid;gap:8px;pointer-events:none}
+#toast div{background:var(--grad);color:#fff;font-weight:800;padding:11px 20px;border-radius:14px;box-shadow:var(--glow);animation:tin .35s,tout .4s 2.6s forwards}
+@keyframes tin{from{transform:translateY(-12px);opacity:0}}@keyframes tout{to{opacity:0}}
+.note{padding:10px 14px;border-radius:12px;background:rgba(124,92,255,.1);border:1px solid rgba(124,92,255,.3);font-size:.9rem}
+.banner{background:var(--card2);border-bottom:1px solid var(--line);padding:8px 32px;font-size:.82rem;color:var(--mut)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+ <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+ <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+ <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z"/></symbol>
+ <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+ <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+</svg>
+<div class="banner">🎨 <b>Design sample</b> — static mock-up for approval. Subject → Chapter → Topic structure, with an interactive concept page (all interactions below really work). Progress is only saved in this browser.</div>
+<div class="app">
+ <aside class="side">
+  <div class="logo"><b>GP</b><span>GATE Prep<small>Learn</small></span></div>
+  <div class="subj" onclick="go('subject')"><div class="badge" style="--c:#3b82f6">⚙</div><div class="grow"><b>Operating Systems</b><div class="small muted">6 chapters · 38 topics</div></div><div class="ring" id="subjRing" style="--p:0"><span>0%</span></div></div>
+  <div id="tree"></div>
+ </aside>
+ <div class="main">
+  <div class="top">
+   <div class="crumbs" id="crumbs"></div><div class="grow"></div>
+   <span class="chip" title="Credits">⚡ <b id="cr">0</b></span>
+   <button class="iconbtn" id="theme" title="Theme"><svg class="i"><use href="#i-moon"/></svg></button>
+   <div class="rbar" id="rbar"></div>
+  </div>
+
+  <!-- ================= VIEW: SUBJECT ================= -->
+  <div class="view" id="v-subject"><div class="wrapper" style="grid-template-columns:1fr"><div>
+   <div class="hero"><span class="tag" style="background:rgba(255,255,255,.18);color:#fff">Subject</span><h1>Operating Systems</h1><p style="opacity:.85;max-width:60ch">Understand how the OS shares the CPU, memory and disks — step by step, with simulators and GATE-level practice after every topic.</p>
+    <div class="meta"><span>6 chapters</span><span>38 topics</span><span>~14 hours</span><span>420 practice questions</span></div></div>
+   <h2 style="margin:30px 0 14px;font-size:1.3rem">Chapters</h2>
+   <div class="grid gauto" id="chGrid"></div>
+  </div></div></div>
+
+  <!-- ================= VIEW: CHAPTER ================= -->
+  <div class="view" id="v-chapter"><div class="wrapper" style="grid-template-columns:1fr"><div>
+   <div class="hero"><span class="tag" style="background:rgba(255,255,255,.18);color:#fff">Chapter 2</span><h1>CPU Scheduling</h1><p style="opacity:.85;max-width:60ch">Who gets the CPU next? Learn the criteria, the classic algorithms and how to compute waiting and turnaround times quickly in the exam.</p>
+    <div class="meta"><span>5 topics</span><span>~95 min</span><span>GATE weight: ★★★★☆</span></div></div>
+   <div class="row sp" style="margin:26px 0 12px"><h2 style="font-size:1.3rem">Topics in this chapter</h2><span class="muted small" id="chProg"></span></div>
+   <div id="topicList"></div>
+   <div class="card row sp wrap" style="margin-top:18px"><div><b>Chapter test</b><div class="muted small">20 mixed GATE-level questions · 30 min · unlocks after all topics</div></div><button class="btn" disabled>Locked until topics are done</button></div>
+  </div></div></div>
+
+  <!-- ================= VIEW: TOPIC ================= -->
+  <div class="view on" id="v-topic"><div class="wrapper"><div id="article">
+   <div class="hero">
+    <span class="tag" style="background:rgba(255,255,255,.18);color:#fff">Chapter 2 · Topic 3 of 5</span>
+    <h1>Round Robin Scheduling</h1>
+    <p style="opacity:.88;max-width:62ch;font-size:1.05rem">The “fair share” scheduler: everyone gets a turn, nobody waits forever. Learn it in 12 minutes, then test yourself with GATE-level questions.</p>
+    <div class="meta"><span>⏱ 12 min read</span><span>🧪 1 simulator</span><span>✍ 4 practice questions</span><span>🎯 GATE: very frequent</span></div>
+   </div>
+
+   <!-- 1 -->
+   <section class="sec" id="s1"><div class="sh"><div class="num">1</div><h2>The idea in one line</h2></div>
+    <div class="callout key"><div class="ic">💡</div><div><b class="t">Key idea</b>Give every process a fixed slice of CPU time called the <b>time quantum</b>. When the slice ends and the process isn't finished, send it to the <b>back of the queue</b> and let the next one run.</div></div>
+    <div class="card analogy"><div class="em">🛝</div><div><b>Think of a playground swing.</b><p class="muted" style="margin:4px 0 0">Four kids want the swing. Rule: each kid swings for 3 minutes, then must hop off and join the back of the line — even if they want more. Everyone keeps getting turns, no kid waits forever, and nobody can hog the swing. The swing is the CPU, the kids are processes, and “3 minutes” is the time quantum.</p></div></div>
+   </section>
+
+   <!-- 2 -->
+   <section class="sec" id="s2"><div class="sh"><div class="num">2</div><h2>How it works, step by step</h2></div>
+    <p class="lead">Round Robin (RR) is <b>pre-emptive</b>: the OS uses a timer interrupt to take the CPU away when the quantum expires.</p>
+    <ol class="steps">
+     <li><div><b>Keep a ready queue</b> (first-in, first-out) of processes that are waiting for the CPU.</div></li>
+     <li><div><b>Pick the process at the front</b> and run it for at most <code>q</code> time units.</div></li>
+     <li><div><b>If it finishes early</b> (burst ≤ q), it leaves and the CPU immediately picks the next process.</div></li>
+     <li><div><b>If the quantum expires first</b>, the OS pre-empts it, saves its state (a <i>context switch</i>) and puts it at the <b>back</b> of the queue.</div></li>
+     <li><div><b>Repeat</b> until every process has finished.</div></li>
+    </ol>
+    <div class="callout warn"><div class="ic">⚠️</div><div><b class="t">Tie-break rule used in GATE</b>If a new process arrives at the <i>same instant</i> a running process is pre-empted, the <b>new arrival goes into the queue first</b>, then the pre-empted process. (Unless the question says otherwise.)</div></div>
+   </section>
+
+   <!-- 3 -->
+   <section class="sec" id="s3"><div class="sh"><div class="num">3</div><h2>Try it yourself — interactive simulator</h2></div>
+    <p class="muted">Change the arrival times, burst times and the quantum, then press <b>Step</b> or <b>Play</b>. Watch the CPU, the ready queue and the Gantt chart.</p>
+    <div class="card sim">
+     <div class="hd"><div class="row" style="gap:18px;flex-wrap:wrap"><label class="row" style="gap:10px"><b>Quantum</b><input type="range" id="q" min="1" max="10" value="3"><span class="chip" id="qv">3</span></label></div>
+      <div class="row"><button class="btn sm" id="bReset">⏮ Reset</button><button class="btn sm" id="bStep">⏭ Step</button><button class="btn sm pri" id="bPlay">▶ Play</button>
+       <select id="spd" class="btn sm" style="padding:6px 8px"><option value="900">0.5×</option><option value="450" selected>1×</option><option value="200">2×</option></select></div></div>
+     <div class="bd">
+      <table class="pt" id="pt"><thead><tr><th>Process</th><th>Arrival</th><th>Burst</th></tr></thead><tbody></tbody></table>
+      <div class="stage">
+       <div class="cpu"><small>CPU</small><div class="who" id="who">—</div><small id="used">idle</small><small id="clock">t = 0</small></div>
+       <div class="rq"><div class="lab"><span>Ready queue (front → back)</span><span id="qinfo"></span></div><div class="qs" id="qs"></div></div>
+      </div>
+      <b class="small muted">Gantt chart</b><div class="gantt" id="gantt"></div>
+      <div class="res" id="res"></div>
+     </div>
+    </div>
+    <div class="card" style="margin-top:16px"><div class="row sp wrap"><div><b>What does the quantum do?</b><div class="muted small">Average waiting time and number of context switches for your processes, for every quantum from 1 to 10 (current one is highlighted).</div></div></div>
+     <div class="chart" id="chart"></div><div class="legend"><span>▮ Avg waiting time</span><span id="cmp"></span></div></div>
+    <div class="callout tip"><div class="ic">🧠</div><div><b class="t">Experiment</b>Set the quantum to <b>10</b>: the schedule becomes identical to FCFS. Set it to <b>1</b>: switches explode. That is the whole trade-off of Round Robin.</div></div>
+   </section>
+
+   <!-- 4 -->
+   <section class="sec" id="s4"><div class="sh"><div class="num">4</div><h2>Formulas you must know</h2></div>
+    <div class="grid g3">
+     <div class="formula"><span>TAT = CT − AT</span><small>Turnaround</small></div>
+     <div class="formula"><span>WT = TAT − BT</span><small>Waiting</small></div>
+     <div class="formula"><span>RT = first CPU − AT</span><small>Response</small></div>
+    </div>
+    <div class="grid g2" style="margin-top:16px">
+     <div class="card"><b>CT</b> = completion time · <b>AT</b> = arrival time · <b>BT</b> = burst time<p class="muted small" style="margin:8px 0 0">Waiting time is the total time spent <i>sitting in the ready queue</i>, not just before the first run.</p></div>
+     <div class="card"><b>CPU efficiency with switch cost s</b><div class="formula" style="margin-top:8px"><span>η = q / (q + s)</span><small>when processes always use full slices</small></div></div>
+    </div>
+    <details open><summary>How to choose the quantum?</summary><div class="bd">
+     <ul style="margin:0;padding-left:20px"><li><b>Too small</b> → the CPU spends its time switching (overhead), throughput drops.</li><li><b>Too large</b> → behaves like FCFS, response time suffers.</li><li><b>Rule of thumb:</b> about 80% of CPU bursts should be shorter than q.</li></ul></div></details>
+   </section>
+
+   <!-- 5 -->
+   <section class="sec" id="s5"><div class="sh"><div class="num">5</div><h2>Worked example</h2></div>
+    <div class="card"><b>Problem.</b> Four processes, quantum = 3. Find the average waiting time.
+     <table class="rt" style="margin-top:10px;min-width:0;max-width:320px"><thead><tr><th>Process</th><th>AT</th><th>BT</th></tr></thead><tbody><tr><td>P1</td><td>0</td><td>5</td></tr><tr><td>P2</td><td>1</td><td>3</td></tr><tr><td>P3</td><td>2</td><td>8</td></tr><tr><td>P4</td><td>3</td><td>6</td></tr></tbody></table>
+    </div>
+    <details open><summary>Step 1 — Build the Gantt chart</summary><div class="bd">
+     <pre class="tr">| P1 | P2 | P3 | P4 | P1 | P3 | P4 | P3 |
+0    3    6    9   12   14   17   20   22</pre>
+     <p class="muted small" style="margin:0">At t = 3, P4 arrives <i>and</i> P1 is pre-empted: P4 enters the queue first (tie-break rule), then P1. Queue after P1's first slice: P2, P3, P4, P1.</p></div></details>
+    <details><summary>Step 2 — Completion times</summary><div class="bd">P2 finishes at <b>6</b>, P1 at <b>14</b>, P4 at <b>20</b>, P3 at <b>22</b>.</div></details>
+    <details><summary>Step 3 — Turnaround and waiting time</summary><div class="bd">
+     <table class="rt" style="min-width:0"><thead><tr><th>Process</th><th>CT</th><th>TAT = CT − AT</th><th>WT = TAT − BT</th></tr></thead><tbody>
+      <tr><td>P1</td><td>14</td><td>14</td><td>9</td></tr><tr><td>P2</td><td>6</td><td>5</td><td>2</td></tr><tr><td>P3</td><td>22</td><td>20</td><td>12</td></tr><tr><td>P4</td><td>20</td><td>17</td><td>11</td></tr></tbody>
+      <tfoot><tr><td colspan="3">Average waiting time</td><td>34 / 4 = <b>8.5</b></td></tr></tfoot></table></div></details>
+    <div class="callout tip"><div class="ic">⚡</div><div><b class="t">Exam shortcut</b>Total time = sum of all bursts when the CPU never idles (here 5+3+8+6 = 22). Use it to sanity-check your last completion time.</div></div>
+   </section>
+
+   <!-- 6 -->
+   <section class="sec" id="s6"><div class="sh"><div class="num">6</div><h2>Common mistakes (GATE traps)</h2></div>
+    <div class="grid g2">
+     <div class="callout trap"><div class="ic">🪤</div><div><b class="t">Wrong queue order on ties</b>Forgetting that a newly arrived process is queued <i>before</i> the pre-empted one.</div></div>
+     <div class="callout trap"><div class="ic">🪤</div><div><b class="t">Counting context switches</b>The first dispatch and the final completion usually do <b>not</b> count. A process continuing alone is not a switch.</div></div>
+     <div class="callout trap"><div class="ic">🪤</div><div><b class="t">Waiting vs response time</b>Response time stops at the <i>first</i> CPU access; waiting time includes <i>all</i> time in the ready queue.</div></div>
+     <div class="callout trap"><div class="ic">🪤</div><div><b class="t">Assuming RR minimises waiting time</b>SJF is optimal for average waiting time. RR optimises <i>fairness and response</i>.</div></div>
+    </div>
+   </section>
+
+   <!-- 7 -->
+   <section class="sec" id="s7"><div class="sh"><div class="num">7</div><h2>Quick check</h2></div>
+    <p class="muted">Two instant questions — no pressure, just to lock the idea in.</p>
+    <div id="quick"></div>
+   </section>
+
+   <!-- 8 -->
+   <section class="sec" id="s8"><div class="sh"><div class="num">8</div><h2>GATE-level practice</h2></div>
+    <div class="card row sp wrap" style="margin-bottom:6px"><div class="score"><b>Your score</b><span class="chip" id="scoreChip">0 / 4 correct</span><span class="chip">⚡ <b id="earned">0</b> credits earned here</span></div><span class="muted small">Easy +2 · Medium +4 · Hard +7 credits</span></div>
+    <div id="practice"></div>
+    <div class="note">In the real platform these questions come from the same bank as the DPPs and tests, so everything you solve here counts toward your levels.</div>
+   </section>
+
+   <!-- 9 -->
+   <section class="sec" id="s9"><div class="sh"><div class="num">9</div><h2>Summary — cheat sheet</h2></div>
+    <div class="card"><ul style="margin:0;padding-left:20px;display:grid;gap:6px">
+     <li>RR = FCFS + <b>time quantum</b> + <b>pre-emption</b>.</li>
+     <li>Pre-empted process → <b>back of the ready queue</b>; same-instant arrivals queue <b>first</b>.</li>
+     <li>Large q ⇒ FCFS · tiny q ⇒ processor sharing but heavy switching.</li>
+     <li>No starvation; good response time; average waiting time is usually <b>higher</b> than SJF.</li>
+     <li>TAT = CT − AT · WT = TAT − BT · RT = first run − AT.</li>
+    </ul></div>
+    <div class="card row sp wrap" style="margin-top:16px"><div><b>Finished this topic?</b><div class="muted small">Mark it complete to earn <b>+20 credits</b> and unlock the next topic's practice set.</div></div><button class="btn pri" id="complete">✔ Mark as complete</button></div>
+    <div class="next"><a class="btn" onclick="go('chapter')"><svg class="i"><use href="#i-back"/></svg> Back to chapter</a><a class="btn pri" onclick="toast('Next: Priority Scheduling & MLFQ')">Next topic: Priority & MLFQ <svg class="i"><use href="#i-arrow"/></svg></a></div>
+   </section>
+  </div>
+  <nav class="toc"><h4>On this page</h4>
+   <a data-s="s1">The idea</a><a data-s="s2">How it works</a><a data-s="s3">Simulator</a><a data-s="s4">Formulas</a><a data-s="s5">Worked example</a><a data-s="s6">Common mistakes</a><a data-s="s7">Quick check</a><a data-s="s8">GATE practice</a><a data-s="s9">Summary</a></nav>
+  </div></div>
+ </div>
+</div>
+<div id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const COL=['#a78bfa','#38bdf8','#34d399','#fbbf24','#fb7185'];
+/* ---------- persistent state ---------- */
+let S={done:{},credits:0,ans:{}};
+try{S=Object.assign(S,JSON.parse(localStorage.getItem('gp-learn')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('gp-learn',JSON.stringify(S))}catch(e){}};
+function toast(t){const d=document.createElement('div');d.textContent=t;$('#toast').appendChild(d);setTimeout(()=>d.remove(),3100)}
+$('#theme').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;try{localStorage.setItem('gp-theme',t)}catch(e){}};
+
+/* ---------- course structure ---------- */
+const COURSE=[
+ {n:'Processes & Threads',t:['What is a process?','Process states & PCB','Threads & multithreading','System calls & fork()'],pre:true},
+ {n:'CPU Scheduling',t:['Scheduling criteria','FCFS & SJF','Round Robin Scheduling','Priority Scheduling & MLFQ','Practice: scheduling problems'],cur:true},
+ {n:'Synchronization',t:['Race conditions','Critical section & Peterson','Semaphores','Classic problems','Monitors']},
+ {n:'Deadlocks',t:['Deadlock conditions','Prevention & avoidance','Banker\'s algorithm','Detection & recovery']},
+ {n:'Memory Management',t:['Paging','Segmentation','Virtual memory','Page replacement','TLB & EAT']},
+ {n:'File Systems & Disk',t:['File allocation','Inodes','Disk scheduling','RAID']}];
+const TOPIC_ID=(c,i)=>c+'-'+i;
+function isDone(c,i){return !!S.done[TOPIC_ID(c,i)]}
+function pctAll(){let n=0,d=0;COURSE.forEach((c,ci)=>c.t.forEach((_,i)=>{n++;if(isDone(ci,i))d++}));return Math.round(d*100/n)}
+function pctCh(ci){const c=COURSE[ci];return Math.round(c.t.filter((_,i)=>isDone(ci,i)).length*100/c.t.length)}
+function buildTree(){
+ $('#tree').innerHTML=COURSE.map((c,ci)=>`<div class="chap ${c.cur?'open':''}" data-c="${ci}"><button><span class="n">${ci+1}</span><span class="grow">${c.n}</span><span class="small muted">${pctCh(ci)}%</span></button><div class="tl">${c.t.map((t,i)=>`<a class="${ci==1&&i==2?'cur':''}" data-c="${ci}" data-i="${i}"><span class="dot ${isDone(ci,i)?'done':''}">${isDone(ci,i)?'<svg class="i"><use href="#i-check"/></svg>':''}</span>${t}</a>`).join('')}</div></div>`).join('');
+ $$('.chap>button').forEach(b=>b.onclick=()=>{const p=b.parentElement;p.classList.toggle('open');if(p.classList.contains('open')&&p.dataset.c==1)go('chapter')});
+ $$('.tl a').forEach(a=>a.onclick=()=>{if(a.dataset.c==1&&a.dataset.i==2)go('topic');else toast('Not part of this sample — same layout as this topic')});
+ const p=pctAll();$('#subjRing').style.setProperty('--p',p);$('#subjRing span').textContent=p+'%';
+}
+function buildOverview(){
+ $('#chGrid').innerHTML=COURSE.map((c,ci)=>`<div class="card chcard" onclick="${ci==1?"go('chapter')":"toast('Same layout as Chapter 2 in this sample')"}"><div class="row sp"><span class="badge" style="--c:${COL[ci%5]}">${ci+1}</span><span class="tag">${c.t.length} topics</span></div><div><b style="font-size:1.1rem">${c.n}</b><div class="muted small">${c.t.slice(0,3).join(' · ')}…</div></div><div class="bar"><i style="width:${pctCh(ci)}%"></i></div><div class="small muted">${pctCh(ci)}% complete</div></div>`).join('');
+ const c=COURSE[1];
+ $('#topicList').innerHTML=c.t.map((t,i)=>`<div class="tli" onclick="${i==2?"go('topic')":"toast('Same layout as the Round Robin page')"}"><span class="dot ${isDone(1,i)?'done':''}" style="width:26px;height:26px">${isDone(1,i)?'<svg class="i"><use href="#i-check"/></svg>':''}</span><div class="grow"><b>${i+1}. ${t}</b><div class="muted small">${[8,10,12,10,25][i]} min · ${[1,1,1,1,0][i]?'simulator · ':''}${[3,4,4,3,12][i]} practice questions</div></div><span class="tag ${['easy','easy','medium','medium','hard'][i]}">${['easy','easy','medium','medium','hard'][i]}</span></div>`).join('');
+ $('#chProg').textContent=pctCh(1)+'% complete';
+}
+const CR={subject:['Operating Systems'],chapter:['Operating Systems','CPU Scheduling'],topic:['Operating Systems','CPU Scheduling','Round Robin']};
+function go(v){
+ $$('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
+ const c=CR[v];$('#crumbs').innerHTML=['<a onclick="go(\'subject\')">Learn</a>'].concat(c.map((x,i)=>i==c.length-1?'<b style="color:var(--txt)">'+x+'</b>':`<a onclick="go('${['subject','chapter'][i]}')">${x}</a>`)).join(' / ');
+ window.scrollTo(0,0);
+}
+
+/* ---------- Round-robin engine (shared by simulator, chart and checks) ---------- */
+function rr(procs,q){
+ const n=procs.length,rem=procs.map(p=>p.bt),first=Array(n).fill(null),ct=Array(n).fill(null),added=Array(n).fill(false);
+ let t=0,queue=[],cur=null,used=0,done=0;const tl=[];
+ while(done<n&&t<200){
+  procs.map((p,i)=>[p.at,i]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]).forEach(([at,i])=>{if(!added[i]&&at<=t){added[i]=true;queue.push(i)}});
+  if(cur!==null){if(rem[cur]===0){ct[cur]=t;done++;cur=null}else if(used===q){queue.push(cur);cur=null}}
+  if(cur===null&&queue.length){cur=queue.shift();used=0;if(first[cur]===null)first[cur]=t}
+  tl.push({t,cur,queue:[...queue],used});
+  if(cur!==null){rem[cur]--;used++}
+  t++;
+ }
+ const tat=ct.map((c,i)=>c-procs[i].at),wt=tat.map((x,i)=>x-procs[i].bt),rt=first.map((f,i)=>f-procs[i].at);
+ let sw=0,last=null;tl.forEach(x=>{if(x.cur!==null){if(last!==null&&last!==x.cur)sw++;last=x.cur}});
+ return {tl,ct,tat,wt,rt,sw,avgWT:wt.reduce((a,b)=>a+b,0)/n};
+}
+/* ---------- simulator UI ---------- */
+const DEF=[[0,5],[1,3],[2,8],[3,6]];
+$('#pt tbody').innerHTML=DEF.map((d,i)=>`<tr><td><span class="pp" style="--c:${COL[i]}"><i></i>P${i+1}</span></td><td><input type="number" min="0" max="12" value="${d[0]}"></td><td><input type="number" min="1" max="12" value="${d[1]}"></td></tr>`).join('');
+let R=null,step=0,timer=null;
+const readProcs=()=>$$('#pt tbody tr').map(tr=>{const v=[...tr.querySelectorAll('input')].map(x=>Math.max(+x.min,Math.min(+x.max,parseInt(x.value)||+x.min)));return{at:v[0],bt:v[1]}});
+function resetSim(){clearInterval(timer);timer=null;$('#bPlay').textContent='▶ Play';step=0;R=rr(readProcs(),+$('#q').value);draw();chart()}
+function draw(){
+ const q=+$('#q').value,n=R.tl.length;
+ const cur=step<n?R.tl[step]:null;
+ $('#clock').textContent='t = '+Math.min(step,n);
+ if(cur&&cur.cur!==null){$('#who').textContent='P'+(cur.cur+1);$('#who').style.color=COL[cur.cur];$('#used').textContent='slice '+(cur.used+1)+' / '+q}
+ else{$('#who').textContent=step>=n?'✔':'—';$('#who').style.color='';$('#used').textContent=step>=n?'all done':'idle'}
+ const qs=cur?cur.queue:[];$('#qs').innerHTML=qs.map(i=>`<div class="qchip" style="background:${COL[i]}">P${i+1}</div>`).join('')||'<span class="muted small">empty</span>';
+ $('#qinfo').textContent=qs.length+' waiting';
+ $('#gantt').innerHTML=R.tl.map((x,k)=>k<step?`<div class="gc ${k==step-1?'now':''}" data-t="${k}" style="background:${x.cur===null?'var(--line2)':COL[x.cur]}">${x.cur===null?'':'P'+(x.cur+1)}</div>`:`<div class="gc" data-t="${k}"></div>`).join('')+`<div class="gc" data-t="${n}" style="background:none"></div>`;
+ const g=$('#gantt');g.scrollLeft=Math.max(0,(step-8)*32);
+ if(step>=n){
+  const P=readProcs();
+  $('#res').innerHTML=`<table class="rt"><thead><tr><th>Process</th><th>AT</th><th>BT</th><th>CT</th><th>TAT</th><th>WT</th><th>RT</th></tr></thead><tbody>${P.map((p,i)=>`<tr><td><span class="pp" style="--c:${COL[i]}"><i></i>P${i+1}</span></td><td>${p.at}</td><td>${p.bt}</td><td>${R.ct[i]}</td><td>${R.tat[i]}</td><td>${R.wt[i]}</td><td>${R.rt[i]}</td></tr>`).join('')}</tbody><tfoot><tr><td colspan="4">Averages · context switches: ${R.sw}</td><td>${(R.tat.reduce((a,b)=>a+b,0)/P.length).toFixed(2)}</td><td>${R.avgWT.toFixed(2)}</td><td>${(R.rt.reduce((a,b)=>a+b,0)/P.length).toFixed(2)}</td></tr></tfoot></table>`;
+ }else $('#res').innerHTML='';
+}
+function chart(){
+ const P=readProcs(),qq=+$('#q').value,all=[];for(let q=1;q<=10;q++)all.push({q,...rr(P,q)});
+ const mx=Math.max(...all.map(a=>a.avgWT));
+ $('#chart').innerHTML=all.map(a=>`<div class="c ${a.q==qq?'cur':''}"><b>${a.avgWT.toFixed(1)}</b><i style="height:${Math.max(6,a.avgWT/mx*85)}%"></i><span>q=${a.q}</span></div>`).join('');
+ const c=all[qq-1];$('#cmp').textContent='At q = '+qq+': '+c.sw+' context switches';
+}
+$('#q').oninput=()=>{$('#qv').textContent=$('#q').value;resetSim()};
+$$('#pt input').forEach(i=>i.oninput=resetSim);
+$('#bReset').onclick=resetSim;
+$('#bStep').onclick=()=>{if(step<R.tl.length){step++;draw()}};
+$('#bPlay').onclick=()=>{if(timer){clearInterval(timer);timer=null;$('#bPlay').textContent='▶ Play';return}
+ if(step>=R.tl.length)step=0;$('#bPlay').textContent='⏸ Pause';timer=setInterval(()=>{if(step>=R.tl.length){clearInterval(timer);timer=null;$('#bPlay').textContent='▶ Play';return}step++;draw()},+$('#spd').value)};
+$('#spd').onchange=()=>{if(timer){clearInterval(timer);$('#bPlay').click();$('#bPlay').click()}};
+
+/* ---------- questions ---------- */
+const QUICK=[
+ {id:'k1',t:'A process uses its entire time quantum but still needs more CPU. What happens to it?',o:['It is terminated','It goes to the back of the ready queue','It stays on the CPU until it finishes','It moves to the waiting (I/O) state'],a:1,e:'Pre-emption puts it at the tail of the ready queue — it is still ready, just not running.'},
+ {id:'k2',t:'If the time quantum is made extremely large, Round Robin behaves like…',o:['SJF','Priority scheduling','FCFS','Shortest Remaining Time First'],a:2,e:'No process is ever pre-empted before it finishes, so they simply run in arrival order — FCFS.'}];
+const PRAC=[
+ {id:'p1',type:'single',diff:'medium',marks:1,t:'Processes P1 (AT 0, BT 4), P2 (AT 1, BT 3) and P3 (AT 2, BT 1) are scheduled by Round Robin with time quantum 2. In what order do the processes COMPLETE?',o:['P3, P1, P2','P1, P2, P3','P3, P2, P1','P2, P3, P1'],a:0,
+  e:'Gantt: P1(0–2), P2(2–4), P3(4–5), P1(5–7), P2(7–8).\nAt t=2 P2 (arrived at 1) and P3 (arrived at 2) are already queued before P1 is pre-empted → queue P2, P3, P1.\nCompletion times: P3 = 5, P1 = 7, P2 = 8 → order P3, P1, P2.'},
+ {id:'p2',type:'nat',diff:'medium',marks:2,t:'Three processes arrive at time 0 with CPU bursts of 10, 5 and 8 ms. Round Robin with time quantum 4 ms is used (ignore context-switch time). What is the average waiting time in ms? (answer up to 2 decimals)',a:12.67,tol:0.01,
+  e:'Gantt: P1(0–4), P2(4–8), P3(8–12), P1(12–16), P2(16–17), P3(17–21), P1(21–23).\nCompletion: P1 = 23, P2 = 17, P3 = 21 (all AT = 0, so TAT = CT).\nWT = TAT − BT: 13, 12, 13 → average = 38 / 3 ≈ 12.67 ms.'},
+ {id:'p3',type:'multi',diff:'hard',marks:2,t:'Which of the following statements about Round Robin scheduling are TRUE? (select all)',o:['With a very large time quantum it behaves like FCFS','It is a pre-emptive algorithm','It can cause starvation of long processes','Its average waiting time is always lower than that of SJF','With a very small quantum (ignoring switch cost) each of n processes appears to run on a CPU n times slower'],a:[0,1,4],
+  e:'True: large q ⇒ FCFS; RR is pre-emptive (timer interrupt); tiny q ⇒ processor sharing.\nFalse: RR never starves a process (every process gets a turn within (n−1)·q), and SJF is optimal for average waiting time, so RR cannot always beat it.'},
+ {id:'p4',type:'nat',diff:'hard',marks:2,t:'Five processes, all arriving at time 0, each need 7 ms of CPU. Round Robin with quantum 3 ms is used. How many context switches occur? (do not count the initial dispatch or the final completion)',a:14,tol:0,
+  e:'Each process needs ⌈7/3⌉ = 3 slices (3 + 3 + 1), so there are 5 × 3 = 15 slices in total.\nSwitches happen between consecutive slices: 15 − 1 = 14 (consecutive slices always belong to different processes here).'}];
+const PTS={easy:2,medium:4,hard:7};
+function renderQuick(){
+ $('#quick').innerHTML=QUICK.map(q=>`<div class="card q" data-id="${q.id}"><b>${q.t}</b>${q.o.map((o,i)=>`<button class="opt" data-i="${i}"><span class="k">${'ABCD'[i]}</span><span>${o}</span></button>`).join('')}<div class="fb"></div></div>`).join('');
+ $$('#quick .q').forEach(card=>{const q=QUICK.find(x=>x.id===card.dataset.id);card.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+  card.querySelectorAll('.opt').forEach((x,i)=>{x.classList.add('lock');if(i===q.a)x.classList.add('right');else if(x===b)x.classList.add('bad')});
+  const ok=+b.dataset.i===q.a,fb=card.querySelector('.fb');fb.className='fb on '+(ok?'ok':'no');fb.innerHTML=`<b>${ok?'✓ Correct!':'✗ Not quite'}</b><div class="muted" style="margin-top:4px">${q.e}</div>`})});
+}
+function renderPractice(){
+ $('#practice').innerHTML=PRAC.map((q,qi)=>{const L='ABCDE';
+  const body=q.type==='nat'?`<input class="nat" type="number" step="any" placeholder="Your answer">`:q.o.map((o,i)=>`<button class="opt ${q.type==='multi'?'multi':''}" data-i="${i}"><span class="k">${L[i]}</span><span>${o}</span></button>`).join('');
+  return `<div class="card q" data-id="${q.id}"><div class="qh"><div class="row" style="gap:8px"><b>Q${qi+1}</b><span class="tag ${q.diff}">${q.diff}</span><span class="tag">${q.type==='single'?'MCQ':q.type==='multi'?'MSQ':'NAT'}</span><span class="tag">${q.marks} mark${q.marks>1?'s':''}</span></div><span class="muted small">GATE-level</span></div>
+  <div style="white-space:pre-wrap">${q.t}</div><div style="margin-top:10px">${body}</div>
+  <div class="row" style="margin-top:12px;gap:10px"><button class="btn pri sm chk">Check answer</button><button class="btn sm hint">Show hint</button></div>
+  <div class="hintbox muted small" style="display:none;margin-top:8px">💡 ${['Draw the Gantt chart and watch who is in the queue at each pre-emption.','Track each process\'s remaining burst after every quantum, then use WT = CT − AT − BT.','Eliminate options using what you know about the quantum and starvation.','Count the slices each process needs: ⌈burst / q⌉.'][qi]}</div>
+  <div class="fb"></div></div>`}).join('');
+ $$('#practice .q').forEach(card=>{const q=PRAC.find(x=>x.id===card.dataset.id);const sel=new Set();
+  card.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(q.type==='single'){sel.clear();sel.add(i);card.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel',x===b))}else{sel.has(i)?sel.delete(i):sel.add(i);b.classList.toggle('sel')}});
+  card.querySelector('.hint').onclick=()=>{const h=card.querySelector('.hintbox');h.style.display=h.style.display==='none'?'block':'none'};
+  card.querySelector('.chk').onclick=()=>{
+   if(S.ans[q.id]!==undefined)return;let ok=false;
+   if(q.type==='nat'){const v=parseFloat(card.querySelector('.nat').value);if(isNaN(v)){toast('Type your answer first');return}ok=Math.abs(v-q.a)<=q.tol+1e-9}
+   else{if(!sel.size){toast('Select an option first');return}const A=q.type==='single'?[q.a]:q.a;ok=A.length===sel.size&&A.every(x=>sel.has(x));
+    card.querySelectorAll('.opt').forEach((x,i)=>{x.classList.add('lock');x.classList.remove('sel');if(A.includes(i))x.classList.add('right');else if(sel.has(i))x.classList.add('bad')})}
+   S.ans[q.id]=ok?1:0;if(ok){S.credits+=PTS[q.diff]}save();showResult(card,q,ok);updateScore()};
+  if(S.ans[q.id]!==undefined){card.querySelector('.chk').disabled=true;showResult(card,q,!!S.ans[q.id],true)}});
+}
+function showResult(card,q,ok,silent){
+ const fb=card.querySelector('.fb');fb.className='fb on '+(ok?'ok':'no');
+ const ans=q.type==='nat'?q.a:(q.type==='single'?'ABCDE'[q.a]:q.a.map(i=>'ABCDE'[i]).join(', '));
+ fb.innerHTML=`${ok?`<span class="cr">+${PTS[q.diff]} credits</span>`:''}<b>${ok?'✓ Correct!':'✗ Not quite — correct answer: '+ans}</b><div style="white-space:pre-wrap;margin-top:6px">${q.e}</div>`;
+ card.querySelector('.chk').disabled=true;if(!silent&&ok)toast('+'+PTS[q.diff]+' credits');
+ if(!silent)$('#cr').textContent=S.credits;
+}
+function updateScore(){const n=PRAC.filter(q=>S.ans[q.id]).length,e=PRAC.reduce((s,q)=>s+(S.ans[q.id]?PTS[q.diff]:0),0);$('#scoreChip').textContent=n+' / '+PRAC.length+' correct';$('#earned').textContent=e;$('#cr').textContent=S.credits}
+$('#complete').onclick=()=>{const k=TOPIC_ID(1,2);if(S.done[k]){toast('Already completed ✔');return}S.done[k]=1;S.credits+=20;save();toast('Topic complete! +20 credits');$('#cr').textContent=S.credits;$('#complete').textContent='✔ Completed';buildTree();buildOverview()};
+if(S.done[TOPIC_ID(1,2)])$('#complete').textContent='✔ Completed';
+
+/* ---------- scroll progress + TOC spy ---------- */
+addEventListener('scroll',()=>{const h=document.documentElement;$('#rbar').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight||1)*100)+'%'});
+const spy=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)$$('.toc a').forEach(a=>a.classList.toggle('on',a.dataset.s===e.target.id))}),{rootMargin:'-20% 0px -70% 0px'});
+$$('.sec').forEach(s=>spy.observe(s));$$('.toc a').forEach(a=>a.onclick=()=>document.getElementById(a.dataset.s).scrollIntoView({behavior:'smooth'}));
+
+/* ---------- init ---------- */
+buildTree();buildOverview();renderQuick();renderPractice();updateScore();resetSim();go('topic');
+</script>
+</body>
+</html>

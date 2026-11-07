@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% import "_m.html" as m %}
+{% block title %}{{ s.code }} · {{ 'Small' if kind=='small' else 'Full' }} tests · GATE Prep{% endblock %}
+{% block body %}
+<div class="row sp wrap"><div class="row"><div class="badge" style="--c:{{ s.color }}">{{ s.glyph }}</div>
+  <div><h1 class="h1">{{ s.code }} · {{ 'Small tests' if kind=='small' else 'Full tests' }}</h1>
+  <p class="muted" style="margin:2px 0 0">{% if kind=='small' %}30 questions · 30 minutes · mixed topics, getting harder as you go{% else %}65 questions · 2 hours · 100 marks · mixed topics{% endif %}</p></div></div>
+  <div class="chip">Level {{ lv.level }} in {{ s.code }}</div></div>
+<div class="note" style="margin:20px 0">Negative marking: ⅓ (1 mark) and ⅔ (2 marks) for MCQ only. Your answers autosave — you can close the app and resume.</div>
+<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr))">{% for t in tests %}{{ m.tcard(t) }}{% else %}<p class="muted">No tests available.</p>{% endfor %}</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}{% import "_m.html" as m %}
+{% block title %}Learn · GATE Prep{% endblock %}
+{% block body %}
+<div class="hero" style="margin-bottom:6px"><span class="tag" style="background:rgba(255,255,255,.18);color:#fff">Learning modules</span>
+ <h1 class="h1" style="font-size:2rem;margin:8px 0 4px">Learn every concept, then practise it</h1>
+ <p style="opacity:.88;max-width:62ch;margin:0">Subject → chapter → topic. Each lesson explains the idea in plain language, shows worked examples, lets you experiment with interactive tools, and ends with GATE-level questions.</p></div>
+<div class="sech"><div><h2 class="h2">Subjects</h2></div></div>
+<div class="grid gauto">
+{% for c in cards %}
+<a class="card scard" href="/learn/{{ c.s.code }}" style="--c:{{ c.s.color }}">
+  <div class="row"><div class="badge" style="--c:{{ c.s.color }}">{{ c.s.glyph }}</div><div class="grow"><div class="nm">{{ c.s.name }}</div>
+    <div class="small muted">{% if c.n %}{{ c.chapters }} chapters · {{ c.n }} lessons · ~{{ (c.minutes/60)|round(1) }} h{% else %}Coming soon{% endif %}</div></div></div>
+  {% if c.n %}<div class="bar sm"><i style="width:{{ c.done|pct(c.n) }}%;background:{{ c.s.color }}"></i></div><div class="small muted">{{ c.done }} of {{ c.n }} lessons completed</div>
+  {% else %}<div class="small muted">Lessons for this subject are being written.</div>{% endif %}
+</a>{% endfor %}
+</div>
+{% endblock %}

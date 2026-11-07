@@ -1,0 +1,25 @@
+{% extends "base.html" %}{% import "_m.html" as m %}
+{% block title %}Import · GATE Prep{% endblock %}
+{% block body %}
+<h1 class="h1">Question bank</h1><p class="muted" style="margin:4px 0 22px">Add your own questions. They are stored in the local database and get stable IDs.</p>
+<div class="grid g2">
+ <div class="card flat"><h2 class="h2">Import JSON / CSV</h2>
+  <form method="post" enctype="multipart/form-data">
+   <label class="f">Subject</label><select name="subject" id="sub">{% for s in SUBJ %}<option value="{{ s.code }}">{{ s.name }}</option>{% endfor %}</select>
+   <label class="f">Topic</label><select name="topic" id="top"></select>
+   <label class="f">Use for</label><select name="pool"><option value="dpp">Practice (DPP) pool</option><option value="test">Test pool (appears in new mock tests)</option></select>
+   <label class="f">File (.json or .csv)</label><input type="file" name="file" accept=".json,.csv">
+   <button class="btn pri" style="margin-top:18px">Import questions</button></form>
+  <p class="small muted" style="margin-top:14px">JSON: <span class="mono">{"questions":[{"q":"…","type":"single|multiple|numerical","options":[…],"answer":[…],"marks":1,"negative":0.33,"difficulty":"easy|medium|hard","explanation":"…"}]}</span><br>
+  CSV columns: question, type, option_a–d, correct (A / A,C / number), marks, negative, difficulty, tolerance.</p></div>
+ <div class="card flat"><h2 class="h2">What's in the bank</h2>
+  <table class="t" style="margin-top:8px"><tr><th>Subject</th><th>Practice</th><th>Test pool</th></tr>
+  {% for s in SUBJ %}<tr><td><b>{{ s.code }}</b> <span class="muted small">{{ s.name }}</span></td>
+   <td>{{ counts|selectattr('subject','eq',s.code)|selectattr('pool','eq','dpp')|map(attribute='n')|sum }}</td>
+   <td>{{ counts|selectattr('subject','eq',s.code)|selectattr('pool','eq','test')|map(attribute='n')|sum }}</td></tr>{% endfor %}</table></div>
+</div>
+{% endblock %}
+{% block scripts %}<script>
+const T={{ topics|tojson }};const s=document.getElementById('sub'),t=document.getElementById('top');
+function f(){t.innerHTML=(T[s.value]||[]).map(x=>`<option>${x.replace(/&/g,'&amp;')}</option>`).join('')}s.onchange=f;f();
+</script>{% endblock %}

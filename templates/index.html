@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Home — GATE Test Platform{% endblock %}
+{% block body %}
+<div class="card pagehead">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1>Your GATE Practice Dashboard</h1>
+      <p class="muted text-sm" style="margin:6px 0 0">{{ dash.total_q }} questions · {{ dash.nsubjects }} subjects · Sprint <b>30Q / 60 min</b> · Full Mock <b>65Q / 3 hr</b></p>
+    </div>
+    {% if last %}
+    <a href="/result/{{ last.id }}" class="btn btn-p">Resume last result →</a>
+    {% endif %}
+  </div>
+  <div class="grid md:grid-cols-4 gap-2" style="margin-top:16px">
+    <div class="stat"><div class="l">Questions</div><div class="v">{{ dash.total_q }}</div></div>
+    <div class="stat"><div class="l">Attempts</div><div class="v">{{ dash.nattempts }}</div></div>
+    <div class="stat"><div class="l">Average score</div><div class="v">{% if dash.avgscore is not none %}{{ "%.1f"|format(dash.avgscore) }}%{% else %}—{% endif %}</div></div>
+    <div class="stat"><div class="l">Subjects</div><div class="v">{{ dash.nsubjects }}</div></div>
+  </div>
+</div>
+{% if weak %}
+<div class="card" style="padding:16px 20px;margin-bottom:16px">
+  <b class="text-sm">🎯 Top weak topics (all subjects)</b>
+  <div class="grid md:grid-cols-5 gap-2" style="margin-top:8px">
+  {% for w in weak %}
+    <div class="stat" style="padding:10px"><div class="l">{{ w.topic }}</div><div class="v" style="font-size:1.2rem">{{ "%.0f"|format(w.c/w.n*100) }}%</div></div>
+  {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% if not lib %}
+<div class="card" style="padding:44px;text-align:center" class="muted">No question banks found. Create folders under <kbd>Tests/</kbd> or import above.</div>
+{% endif %}
+{% for subject, banks in lib.items() %}
+<div class="card" style="padding:20px;margin-bottom:16px">
+  <div class="flex flex-wrap items-center justify-between gap-3" style="margin-bottom:12px">
+    <div class="flex items-center gap-3">
+      <h2 style="margin:0;font-size:1.2rem;font-weight:800">📚 {{ subject }}</h2>
+      <span class="chip">{{ counts[subject] }} Q · {{ att_counts[subject] }} attempts</span>
+      {% if subj_stats[subject].best is not none %}
+      <div class="ring" style="--p:{{ subj_stats[subject].best }}"><span>{{ "%.0f"|format(subj_stats[subject].best) }}%</span></div>
+      {% endif %}
+    </div>
+    <div class="flex gap-2">
+      <a href="/subject/{{ subject }}" class="btn btn-p" style="padding:8px 16px">Open Subject →</a>
+      <a href="/history/subject/{{ subject }}" class="btn btn-d" style="padding:8px 16px">📈 History</a>
+    </div>
+  </div>
+  <div class="grid md:grid-cols-2 gap-2">
+  {% for b in banks %}
+    <a href="/bank/{{ b.subject }}/{{ b.subdir }}/{{ b.bank }}" class="btn btn-d" style="justify-content:space-between;font-weight:600">
+      <span>{{ b.pretty }}</span><span class="chip">{{ b.n }} Q</span>
+    </a>
+  {% endfor %}
+  </div>
+</div>
+{% endfor %}
+<div class="card" style="padding:16px 20px">
+  <b class="text-sm">How it works</b>
+  <p class="muted text-xs" style="margin:6px 0 0"><span class="chip chip-mcq">MCQ</span> one correct, negative on wrong &nbsp; <span class="chip chip-msq">MSQ</span> exact match, no negative &nbsp; <span class="chip chip-nat">NAT</span> numeric ± tolerance, no negative &nbsp;·&nbsp; Every attempt samples fresh questions · Fullscreen locked · Violations logged</p>
+</div>
+{% endblock %}

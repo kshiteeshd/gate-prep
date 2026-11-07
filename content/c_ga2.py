@@ -1,0 +1,198 @@
+"""General Aptitude — curated VERBAL ability (grammar, correction, analogies, jumbles, critical reasoning, comprehension).
+Every row: (difficulty, marks, kind, text, options, answer index, full explanation)."""
+from content.kit import C
+
+V = "Verbal Ability"
+
+C("GA", V, "Grammar & usage", [
+    ("e", 1, "s", "Choose the grammatically correct sentence.", ["Neither of the two candidates has submitted the form.", "Neither of the two candidates have submitted the form.", "Neither of the two candidates are submitting the form.", "Neither of the two candidates were submitted the form."], 0,
+     "'Neither' is singular, so it takes a singular verb: 'has'.\nThe other options either use a plural verb ('have', 'are', 'were') or a passive form that makes no sense here."),
+    ("e", 1, "s", "Fill in the blank: She has been working here ______ 2019.", ["since", "for", "from", "by"], 0,
+     "'Since' is used with a fixed point in time (2019); 'for' is used with a length of time (for five years).\nThe present perfect continuous 'has been working' pairs naturally with 'since 2019'."),
+    ("e", 1, "s", "Fill in the blank: ______ honest man is respected everywhere.", ["An", "A", "The", "No article"], 0,
+     "The article depends on the SOUND of the next word, not its spelling. 'Honest' starts with a silent h, so it begins with a vowel sound: 'an honest man'."),
+    ("e", 1, "s", "Fill in the blank: The teacher, along with her students, ______ going on the trip.", ["is", "are", "were", "have"], 0,
+     "'Along with' does not make the subject plural. The grammatical subject is 'The teacher' (singular), so the verb is 'is'."),
+    ("e", 1, "s", "Fill in the blank: He is allergic ______ peanuts.", ["to", "with", "of", "from"], 0,
+     "The fixed collocation is 'allergic to'."),
+    ("m", 1, "s", "Fill in the blank: If I ______ you, I would accept the offer immediately.", ["were", "was", "am", "will be"], 0,
+     "A hypothetical (unreal present) condition uses the subjunctive: 'If I were you, I would ...'. 'Was' is informal and 'am / will be' do not express the hypothetical."),
+    ("m", 1, "s", "Choose the correct sentence.", ["Each of the engineers has completed his or her module.", "Each of the engineers have completed their module.", "Each of the engineers are completing his module.", "Each of the engineers were completed their module."], 0,
+     "'Each' is a singular subject, so the verb is 'has'. The pronoun must also agree with it ('his or her')."),
+    ("m", 1, "s", "Fill in the blank: Hardly had he reached the station ______ the train left.", ["when", "than", "then", "while"], 0,
+     "'Hardly ... when' (like 'scarcely ... when' and 'no sooner ... than') links two events in quick succession. With 'hardly' we use 'when'; 'than' goes with 'no sooner'."),
+    ("m", 1, "s", "Fill in the blank: The number of applicants for the scholarship ______ increased this year.", ["has", "have", "are", "were"], 0,
+     "'The number of ...' is singular (it talks about the number itself); 'a number of ...' would be plural. Hence 'has increased'."),
+    ("m", 1, "s", "Fill in the blank: By the time we arrived, the film ______.", ["had already started", "has already started", "already starts", "was already start"], 0,
+     "Two past events: the one that happened first (the film starting) takes the past perfect 'had started'; the later one (our arrival) takes the simple past."),
+    ("m", 1, "s", "Which sentence uses the correct form of the adjective?", ["She is the taller of the two sisters.", "She is the tallest of the two sisters.", "She is more taller than her sister.", "She is the most tall of the two sisters."], 0,
+     "With exactly TWO persons we use the comparative with 'the': 'the taller of the two'. Superlatives ('tallest') are for three or more, and 'more taller' is a double comparative."),
+    ("h", 1, "s", "Fill in the blank: Not only ______ late, but he also forgot the documents.", ["did he arrive", "he arrived", "he did arrive", "arrived he"], 0,
+     "When a sentence begins with a negative adverbial like 'Not only', the subject and auxiliary are inverted: 'Not only did he arrive late ...'."),
+    ("h", 1, "s", "Which sentence has NO error?", ["The committee has made its decision.", "The committee have made its decision.", "The committee has made their decisions.", "The committee are made its decision."], 0,
+     "A collective noun acting as one unit takes a singular verb and singular pronoun: 'The committee has made its decision.' Mixing 'have ... its' or 'has ... their' is inconsistent."),
+    ("h", 1, "s", "Choose the option that correctly completes: 'The professor, as well as his assistants, ______ present at the seminar.'", ["was", "were", "are", "have been"], 0,
+     "'As well as' is not a conjunction that pluralises the subject; the verb agrees with 'The professor' (singular). Since the sentence is in the past, 'was'."),
+])
+
+C("GA", V, "Sentence correction", [
+    ("e", 1, "s", "Identify the part of the sentence that has an error: 'He don't (A) know the answer (B) to this question (C).'", ["A", "B", "C", "No error"], 0,
+     "The third-person singular subject 'He' needs 'doesn't', not 'don't'. Part A is wrong."),
+    ("e", 1, "s", "Identify the error: 'The furniture (A) in the room were (B) quite old (C).'", ["A", "B", "C", "No error"], 1,
+     "'Furniture' is an uncountable noun and takes a singular verb, so 'was', not 'were'. Part B is wrong."),
+    ("m", 1, "s", "Identify the error: 'Each of the students (A) have (B) submitted the assignment (C).'", ["A", "B", "C", "No error"], 1,
+     "'Each of the students' has the singular subject 'Each', so the verb should be 'has'. The error is in B."),
+    ("m", 1, "s", "Identify the error: 'Between you and I (A), the plan (B) is not practical (C).'", ["A", "B", "C", "No error"], 0,
+     "After a preposition ('between') the pronoun must be in the objective case: 'between you and me'. Part A is wrong."),
+    ("m", 1, "s", "Identify the error: 'She is (A) one of those women who (B) always speaks (C) the truth.'", ["A", "B", "C", "No error"], 2,
+     "'Who' refers back to the plural 'women', so the verb should be plural: 'always speak'. Part C is wrong."),
+    ("m", 1, "s", "Choose the best replacement for the underlined part: 'The results of the survey was (a) surprising to everyone.'", ["were", "is", "has been", "No change"], 0,
+     "The subject is the plural 'results', so the verb must be plural: 'were surprising'."),
+    ("m", 1, "s", "Choose the best version: ", ["I am looking forward to meeting you.", "I am looking forward to meet you.", "I am looking forward for meeting you.", "I am looking forward to be meeting you."], 0,
+     "'Look forward to' is followed by a gerund because 'to' is a preposition here: 'to meeting'."),
+    ("h", 1, "s", "Identify the error: 'Having finished (A) the work, the lights (B) were switched off (C) by the clerk.'", ["A", "B", "C", "No error"], 1,
+     "This is a dangling participle: 'Having finished the work' must modify the person who finished (the clerk), but the subject of the main clause is 'the lights'. The sentence should read 'Having finished the work, the clerk switched off the lights.'"),
+    ("h", 1, "s", "Which sentence is correctly punctuated?", ["The manager, who had joined last year, was promoted.", "The manager who, had joined last year was promoted.", "The manager who had joined, last year, was promoted.", "The manager, who had joined last year was promoted."], 0,
+     "A non-restrictive relative clause is set off by a pair of commas on BOTH sides: 'The manager, who had joined last year, was promoted.' The other options use a single comma or misplace them."),
+])
+
+C("GA", V, "Synonyms & antonyms", [
+    ("e", 1, "s", "Choose the word closest in meaning to 'MITIGATE'.", ["Alleviate", "Aggravate", "Provoke", "Ignore"], 0,
+     "To mitigate is to make less severe — alleviate. 'Aggravate' is the opposite."),
+    ("e", 1, "s", "Choose the word opposite in meaning to 'FRUGAL'.", ["Extravagant", "Thrifty", "Careful", "Economical"], 0,
+     "Frugal means sparing with money; its opposite is extravagant."),
+    ("m", 1, "s", "Choose the word closest in meaning to 'CIRCUMSPECT'.", ["Cautious", "Careless", "Circular", "Talkative"], 0,
+     "Circumspect = wary and unwilling to take risks (from Latin 'looking around')."),
+    ("m", 1, "s", "Choose the word opposite in meaning to 'AMBIGUOUS'.", ["Explicit", "Vague", "Doubtful", "Obscure"], 0,
+     "Ambiguous = open to more than one meaning; explicit = stated clearly."),
+    ("m", 1, "s", "Choose the word closest in meaning to 'ALACRITY'.", ["Eagerness", "Sluggishness", "Reluctance", "Hostility"], 0,
+     "Alacrity is cheerful readiness or speed in responding — eagerness."),
+    ("m", 1, "s", "Choose the word opposite in meaning to 'ZENITH'.", ["Nadir", "Peak", "Summit", "Apex"], 0,
+     "Zenith is the highest point; nadir is the lowest."),
+    ("h", 1, "s", "Choose the word closest in meaning to 'PERSPICACIOUS'.", ["Shrewd", "Sweaty", "Stubborn", "Transparent"], 0,
+     "Perspicacious = having a ready insight into things, i.e. shrewd. It is easily confused with 'perspicuous' (clearly expressed)."),
+    ("h", 1, "s", "Choose the word opposite in meaning to 'PARSIMONIOUS'.", ["Lavish", "Stingy", "Frugal", "Miserly"], 0,
+     "Parsimonious = extremely unwilling to spend; the opposite is lavish."),
+    ("h", 1, "s", "Choose the word closest in meaning to 'INTRANSIGENT'.", ["Uncompromising", "Flexible", "Compliant", "Cordial"], 0,
+     "Intransigent = refusing to change one's views or agree — uncompromising."),
+])
+
+C("GA", V, "Analogies & odd one out", [
+    ("e", 1, "s", "Choose the pair that has the same relationship as DOCTOR : HOSPITAL.", ["Teacher : School", "Pilot : Airport", "Farmer : Grain", "Judge : Law"], 0,
+     "A doctor works in a hospital, as a teacher works in a school: person : place of work. A pilot flies from an airport but does not 'work in' it in the same sense, and the others are person : product/subject."),
+    ("e", 1, "s", "Choose the pair that has the same relationship as HAND : GLOVE.", ["Foot : Sock", "Head : Hair", "Eye : Tear", "Ear : Sound"], 0,
+     "A glove is worn on the hand just as a sock is worn on the foot: body part : item worn on it."),
+    ("e", 1, "s", "Which word does NOT belong with the others?", ["Carrot", "Potato", "Radish", "Tomato"], 3,
+     "Carrot, potato and radish are root vegetables; the tomato is a fruit that grows above ground."),
+    ("m", 1, "s", "Choose the pair that has the same relationship as KNIFE : CUT.", ["Pen : Write", "Chair : Wood", "Paper : Book", "Needle : Thread"], 0,
+     "A knife is an instrument whose function is to cut; a pen is an instrument whose function is to write: tool : function."),
+    ("m", 1, "s", "Choose the pair that has the same relationship as ARCHIPELAGO : ISLAND.", ["Forest : Tree", "River : Water", "Library : Silence", "Desert : Sand dune"], 0,
+     "An archipelago is a collection of islands; a forest is a collection of trees: whole : constituent unit. A desert is not defined as a collection of dunes."),
+    ("m", 1, "s", "Which word does NOT belong with the others?", ["Sonnet", "Haiku", "Ode", "Novella"], 3,
+     "Sonnet, haiku and ode are forms of poetry; a novella is a short work of prose fiction."),
+    ("m", 1, "s", "Choose the pair that has the same relationship as VERDICT : TRIAL.", ["Diagnosis : Examination", "Poem : Poet", "Sentence : Crime", "Recipe : Meal"], 0,
+     "A verdict is the conclusion reached at the end of a trial; a diagnosis is the conclusion reached after an examination: outcome : process."),
+    ("h", 1, "s", "Choose the pair that has the same relationship as VIRUS : ANTIBODY.", ["Poison : Antidote", "Fire : Smoke", "Tree : Shade", "Teacher : Chalk"], 0,
+     "An antibody is the body's counter to a virus; an antidote is the counter to a poison: harmful agent : counteragent."),
+    ("h", 1, "s", "Choose the pair that has the same relationship as EULOGY : PRAISE.", ["Satire : Ridicule", "Sermon : Church", "Anthem : Country", "Sketch : Pencil"], 0,
+     "A eulogy is a speech whose purpose is to praise; a satire is a work whose purpose is to ridicule: form : intended purpose."),
+    ("h", 1, "s", "Which word does NOT belong with the others?", ["Placid", "Serene", "Tranquil", "Turbulent"], 3,
+     "Placid, serene and tranquil all describe calm; turbulent is the opposite."),
+])
+
+C("GA", V, "Idioms & phrases", [
+    ("e", 1, "s", "Choose the meaning of the idiom 'to break the ice'.", ["To start a conversation in an awkward situation", "To destroy something frozen", "To end a friendship", "To make an urgent decision"], 0,
+     "'Break the ice' means to relieve initial social tension and get people talking."),
+    ("e", 1, "s", "Choose the meaning of 'a blessing in disguise'.", ["A misfortune that turns out to be beneficial", "A hidden curse", "A religious ceremony", "A well-planned surprise"], 0,
+     "The phrase describes something that seems bad at first but eventually brings a good result."),
+    ("m", 1, "s", "Choose the meaning of 'to cut corners'.", ["To do something poorly to save time or money", "To drive carefully around bends", "To divide a field", "To finish ahead of schedule"], 0,
+     "Cutting corners means taking shortcuts at the cost of quality or safety."),
+    ("m", 1, "s", "Choose the meaning of 'the proof of the pudding is in the eating'.", ["The real worth of something is known only by trying it", "Desserts should be tasted before serving", "Cooking requires patience", "Food is better when shared"], 0,
+     "The proverb means that you can judge something's quality only by experiencing or testing it."),
+    ("m", 1, "s", "Choose the meaning of 'to burn the midnight oil'.", ["To work or study late into the night", "To waste resources", "To start a fire", "To argue loudly"], 0,
+     "The phrase refers to working late into the night (originally by the light of an oil lamp)."),
+    ("h", 1, "s", "Choose the meaning of 'to throw down the gauntlet'.", ["To issue a challenge", "To surrender", "To make peace", "To reveal a secret"], 0,
+     "Historically, throwing down a glove was a formal challenge to a duel; today it means offering a challenge."),
+    ("h", 1, "s", "Choose the meaning of 'a Pyrrhic victory'.", ["A win that costs so much it is almost a defeat", "A victory achieved easily", "A narrow loss", "A celebrated comeback"], 0,
+     "King Pyrrhus's costly victories gave the phrase: a success won at ruinous cost."),
+])
+
+C("GA", V, "One-word substitution", [
+    ("e", 1, "s", "One word for 'a person who loves books':", ["Bibliophile", "Bibliographer", "Librarian", "Scholar"], 0,
+     "A bibliophile loves (and often collects) books. A bibliographer compiles lists of books; a librarian looks after them."),
+    ("m", 1, "s", "One word for 'a government by the few':", ["Oligarchy", "Monarchy", "Democracy", "Anarchy"], 0,
+     "Oligarchy = rule by a small group ('oligos' = few)."),
+    ("m", 1, "s", "One word for 'a remedy for all diseases':", ["Panacea", "Placebo", "Antidote", "Vaccine"], 0,
+     "A panacea is a supposed cure-all."),
+    ("m", 1, "s", "One word for 'a person who cannot be corrected':", ["Incorrigible", "Incredible", "Inevitable", "Invincible"], 0,
+     "Incorrigible = unable to be corrected or reformed."),
+    ("h", 1, "s", "One word for 'the study of the origin and history of words':", ["Etymology", "Entomology", "Philology of sounds", "Orthography"], 0,
+     "Etymology studies word origins. Entomology is the study of insects; orthography is correct spelling."),
+    ("h", 1, "s", "One word for 'fear of open spaces':", ["Agoraphobia", "Claustrophobia", "Acrophobia", "Xenophobia"], 0,
+     "Agoraphobia = fear of open or crowded places; claustrophobia = enclosed spaces; acrophobia = heights; xenophobia = strangers."),
+])
+
+C("GA", V, "Sentence completion", [
+    ("e", 1, "s", "The rains were so ______ that the whole village was flooded within hours.", ["torrential", "gentle", "scanty", "occasional"], 0,
+     "Flooding within hours needs very heavy rain: torrential."),
+    ("m", 1, "s", "Because the evidence was ______, the court could not reach a firm verdict.", ["inconclusive", "overwhelming", "irrefutable", "compelling"], 0,
+     "'Could not reach a firm verdict' implies the evidence did not settle the matter: inconclusive."),
+    ("m", 1, "s", "The speaker's tone was ______; the audience could not tell whether he was praising or mocking the proposal.", ["ambivalent", "enthusiastic", "hostile", "transparent"], 0,
+     "Unable to tell praise from mockery = mixed or unclear attitude: ambivalent."),
+    ("m", 2, "s", "Although the instructions seemed ______ at first glance, they proved quite ______ once we tried to follow them.", ["simple; intricate", "clear; lucid", "complex; elaborate", "brief; concise"], 0,
+     "'Although' sets up a contrast between appearance and reality. Only 'simple ... intricate' provides the contrast; the other pairs are near-synonyms."),
+    ("h", 2, "s", "The minister's ______ remarks, far from calming the public, only served to ______ the already tense situation.", ["incendiary; exacerbate", "conciliatory; aggravate", "measured; inflame", "soothing; worsen"], 0,
+     "'Far from calming' tells us the remarks inflamed things: incendiary, which makes them 'exacerbate' (worsen) the tension. 'Conciliatory' or 'soothing' remarks would have calmed the public."),
+    ("h", 2, "s", "A truly ______ scientist does not cling to a theory merely because it is familiar, but ______ it when evidence demands.", ["open-minded; revises", "dogmatic; defends", "obstinate; abandons", "credulous; repeats"], 0,
+     "The sentence praises someone who follows evidence, so the first blank needs 'open-minded' and the second 'revises'. 'Dogmatic ... defends' and 'obstinate ... abandons' contradict the sentence's sense."),
+])
+
+C("GA", V, "Para jumbles", [
+    ("m", 1, "s", "Arrange the sentences to form a coherent paragraph.\nP: Therefore, many people now prefer to work from home.\nQ: The pandemic forced offices around the world to close.\nR: Companies discovered that productivity did not fall.\nS: Employees had to adapt to remote working overnight.", ["QSRP", "QRSP", "SQRP", "PQRS"], 0,
+     "Q introduces the cause (offices closed) → S describes the immediate effect (employees adapted) → R reports what companies found → P concludes with 'Therefore'. Order: Q S R P."),
+    ("m", 1, "s", "Arrange the sentences to form a coherent paragraph.\nP: This reduces the risk of overfitting.\nQ: A common technique is to split the data into training and validation sets.\nR: Building a good model requires testing it on data it has not seen.\nS: The model is fitted on one part and evaluated on the other.", ["RQSP", "QRSP", "RSQP", "SRQP"], 0,
+     "R states the general need. Q gives the technique, S explains how it works, and P gives the benefit ('This reduces ...'). Order: R Q S P."),
+    ("h", 1, "s", "Arrange the sentences to form a coherent paragraph.\nP: As a result, the river changed its course.\nQ: Heavy rainfall continued for nearly a week.\nR: The embankment, already weak, finally gave way.\nS: Water levels rose steadily and pressed on the banks.", ["QSRP", "QRSP", "SQRP", "QSPR"], 0,
+     "Cause chain: heavy rain (Q) → rising water (S) → the weak embankment gives way (R) → consequence 'As a result' (P). Order: Q S R P."),
+    ("h", 2, "s", "Arrange the sentences to form a coherent paragraph.\nP: Yet its elegance hides a subtle danger.\nQ: Recursion lets a problem be solved by reducing it to smaller copies of itself.\nR: Without a proper base case, the calls never stop.\nS: Many algorithms, such as merge sort, are most naturally written this way.", ["QSPR", "QPSR", "SQPR", "QRPS"], 0,
+     "Q defines recursion; S illustrates its usefulness; P ('Yet ...') turns to the danger; R names the danger. Order: Q S P R."),
+])
+
+C("GA", V, "Critical reasoning", [
+    ("m", 1, "s", "A study found that people who drink green tea daily have a lower incidence of heart disease. A health magazine concludes: 'Drinking green tea prevents heart disease.' Which statement, if true, MOST weakens the conclusion?", ["Green-tea drinkers in the study also exercised more and smoked less than others.", "Green tea contains antioxidants.", "Heart disease is common worldwide.", "Some people dislike the taste of green tea."], 0,
+     "The conclusion assumes the tea is the cause. If tea drinkers also exercised more and smoked less, those factors could explain the lower disease rate (a confounding variable). The other statements are irrelevant to causation."),
+    ("m", 1, "s", "Argument: 'Our city's crime rate fell after we installed street cameras, so the cameras reduced crime.' Which of the following is an assumption of the argument?", ["No other significant factor caused the fall in crime.", "Cameras are cheap to install.", "Crime rates in other cities also fell.", "Citizens welcomed the cameras."], 0,
+     "The argument moves from 'after' to 'because of'. It is only valid if nothing else (policing, economy, etc.) explains the drop. Option C would actually weaken it."),
+    ("m", 1, "s", "'All managers in the company attended the workshop. Ravi did not attend the workshop.' Which conclusion follows logically?", ["Ravi is not a manager in the company.", "Ravi is a manager who was absent.", "Ravi should have attended.", "Some managers did not attend."], 0,
+     "All managers attended; Ravi did not; so Ravi cannot be a manager (contrapositive of 'manager → attended')."),
+    ("h", 1, "s", "A company says: 'Since we started offering free lunches, employee satisfaction scores have risen.' Which statement would STRENGTHEN the claim that free lunches improved satisfaction?", ["Satisfaction scores rose only in the offices that introduced free lunches, not in those that did not.", "Free lunches cost the company a lot of money.", "Some employees bring lunch from home.", "Satisfaction scores are measured annually."], 0,
+     "A control comparison (offices with vs without free lunches) removes alternative explanations and so strengthens the causal claim."),
+    ("h", 2, "s", "Premises: (i) Every successful start-up has a clear business model. (ii) Some start-ups with clear business models run out of funds. Which conclusion is VALID?", ["Some start-ups that run out of funds have a clear business model.", "Every start-up that runs out of funds is unsuccessful.", "Some successful start-ups run out of funds.", "All start-ups with clear business models are successful."], 0,
+     "From (ii), at least one start-up has both properties: a clear model AND runs out of funds. So 'some start-ups that run out of funds have a clear business model' follows. (i) says success implies a clear model, not the converse, so C and D do not follow."),
+])
+
+C("GA", V, "Reading comprehension", [
+    ("e", 1, "s", "Passage: 'Bamboo grows faster than most plants; some species can grow nearly a metre in a single day. Because it regenerates quickly after cutting, it is considered a renewable resource.'\nWhat can be inferred about bamboo?", ["It can be harvested repeatedly without replanting.", "It grows only in tropical regions.", "It is stronger than steel.", "It cannot be cut."], 0,
+     "The passage says bamboo regenerates quickly after cutting, so it can be harvested again and again. Nothing is said about the region, strength compared with steel, or inability to be cut."),
+    ("m", 1, "s", "Passage: 'The invention of the printing press did not merely make books cheaper; by fixing a text in identical copies, it allowed scholars in different places to cite the same page, and so changed how knowledge itself was verified.'\nThe author's main point is that the printing press", ["changed the way knowledge could be checked, beyond lowering the cost of books", "was invented to help scholars travel", "made books less accurate", "replaced scholars with machines"], 0,
+     "'Did not merely make books cheaper ... changed how knowledge itself was verified' states the main point directly."),
+    ("m", 1, "s", "Passage: 'Critics of the new tax say it will hurt small shops. Supporters respond that the revenue will fund road repairs that small shops depend on. Both sides agree roads need repair.'\nWhich statement is supported by the passage?", ["Critics and supporters agree on the need for road repairs.", "The tax will certainly benefit small shops.", "Small shops oppose all taxes.", "The roads have already been repaired."], 0,
+     "The last sentence states the point of agreement explicitly. The passage does not claim certainty about the tax's effect on shops."),
+    ("m", 1, "s", "Passage: 'Unlike a compiler, which translates a whole program before it runs, an interpreter translates and executes it line by line. This makes interpreted programs easier to debug, though usually slower.'\nWhich statement does the passage support?", ["Interpreted programs are usually slower than compiled ones.", "Compiled programs are easier to debug.", "Interpreters translate the whole program first.", "Compilers execute line by line."], 0,
+     "The passage states interpreted programs are 'usually slower'. The other options reverse the roles of compiler and interpreter."),
+    ("h", 2, "s", "Passage: 'The more a city invests in public transport, the fewer cars it needs on its roads; the fewer cars there are, the faster buses can run; the faster buses run, the more attractive they become. This virtuous circle explains why a few cities achieve high ridership while others cannot escape a spiral of decline.'\nWhich of the following best captures the author's reasoning?", ["Investment can start a self-reinforcing cycle that raises ridership.", "Cars should be banned in all cities.", "Buses are always faster than cars.", "High ridership is caused by cheap tickets alone."], 0,
+     "The passage describes a feedback loop: investment → fewer cars → faster buses → more riders. The author does not make universal claims (A and B are overstated) or mention ticket prices."),
+    ("h", 2, "s", "Passage: 'A new drug lowered blood pressure in 70% of patients in a trial. However, the trial enrolled only patients under 40 and ran for just three weeks. Doctors are therefore cautious about prescribing it to elderly patients for long-term use.'\nWhich is the most reasonable inference?", ["The trial does not show how the drug performs in older patients over the long term.", "The drug is harmful to elderly patients.", "The drug works for exactly 70% of all people.", "The trial was fraudulent."], 0,
+     "The limitations (age under 40, three weeks) mean the trial cannot support conclusions about elderly or long-term use. Harm, an exact population-wide 70%, or fraud are not stated or implied."),
+])
+
+C("GA", V, "Verbal deduction", [
+    ("e", 1, "s", "'All poets are dreamers. Some dreamers are teachers.' Which conclusion definitely follows?", ["No definite conclusion about poets and teachers", "Some poets are teachers", "All teachers are poets", "No teacher is a poet"], 0,
+     "The 'some dreamers' who are teachers might not include any poet, so nothing definite follows about poets and teachers."),
+    ("m", 1, "s", "Statements: (i) Only graduates can apply. (ii) Meena applied. Which conclusion follows?", ["Meena is a graduate.", "Meena is not a graduate.", "All graduates applied.", "Meena will be selected."], 0,
+     "'Only graduates can apply' means apply → graduate. Meena applied, so Meena is a graduate. It does not say all graduates applied or that anyone is selected."),
+    ("m", 1, "s", "If the statement 'No bird is a mammal' is true, which of the following MUST be true?", ["No mammal is a bird.", "Some birds are mammals.", "All mammals can fly.", "Some mammals are birds."], 0,
+     "The universal negative 'No A is B' is symmetric: 'No B is A'."),
+    ("h", 1, "s", "'Everyone who passes the audit receives a bonus. Priya did not receive a bonus.' What can be concluded?", ["Priya did not pass the audit.", "Priya passed the audit but was overlooked.", "Priya did not take the audit.", "Nobody received a bonus."], 0,
+     "pass → bonus. Priya has no bonus, so by contrapositive she did not pass. (She may or may not have taken the audit.) Hence option A is the only certain conclusion."),
+])

@@ -1,0 +1,75 @@
+{% extends "base.html" %}{% import "_m.html" as m %}
+{% block title %}Dashboard · GATE Prep{% endblock %}
+{% block body %}
+{% set tot_ans = tot_answered %}
+<div class="hero">
+  <div class="row wrap sp" style="gap:26px">
+    <div>
+      <div class="eyebrow">Your rank · Level {{ G.overall.level }}</div>
+      <h1 class="h1" style="font-size:2.1rem">{{ G.overall.title }}</h1>
+      <div class="muted">{% if G.overall.max %}Maximum level reached{% else %}{{ G.overall.to_next }} credits to Level {{ G.overall.level+1 }}{% endif %}</div>
+      <div class="bar" style="width:min(320px,100%);margin-top:10px"><i style="width:{{ G.overall.pct }}%"></i></div>
+    </div>
+    <div class="row wrap" style="gap:12px">
+      <div class="stat"><b>{{ G.total }}</b><span>Credits</span></div>
+      <div class="stat"><b>{{ streak }} <span style="font-size:1rem">🔥</span></b><span>Day streak</span></div>
+      <div class="stat"><b>{{ today_n }}/{{ daily_goal }}</b><span>Today's goal</span></div>
+      <div class="stat"><b>{{ tot_ans }}</b><span>Questions solved</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="sech" style="margin-top:0!important"><div><h2 class="h2">Continue</h2><p>Pick up exactly where you stopped</p></div></div>
+<div class="cont">
+{% for r in running %}<a class="citem" href="/run/{{ r.id }}"><span class="ck">{{ 'Practice' if r.mode=='practice' else 'Test' }} in progress</span><b>{{ r.title }}</b><span class="go">Resume {{ m.ic('arrow') }}</span></a>{% endfor %}
+{% if nl %}<a class="citem" href="/learn/{{ nl.subject }}/{{ nl.slug }}"><span class="ck">Next lesson · {{ nl.subject }}</span><b>{{ nl.title }}</b><span class="go">{{ nl.minutes }} min {{ m.ic('arrow') }}</span></a>{% endif %}
+{% if today_n < daily_goal %}<form method="post" action="/start/dpp" class="citem"><input type="hidden" name="n" value="{{ [daily_goal - today_n, 5]|max if daily_goal - today_n < 10 else 10 }}"><input type="hidden" name="title" value="Daily DPP"><span class="ck">Today's goal · {{ daily_goal - today_n }} to go</span><b>Mixed practice, all subjects</b><button class="go">Start {{ m.ic('arrow') }}</button></form>{% endif %}
+{% if not running and not nl and today_n >= daily_goal %}<div class="citem"><span class="ck">All caught up</span><b>Daily goal met and every lesson finished.</b></div>{% endif %}
+</div>
+
+<div class="sech"><div><h2 class="h2">Choose a subject</h2><p>Open a subject to practise topic-wise DPPs or take a test</p></div><a class="small muted" href="/mocks">Full GATE mocks →</a></div>
+<div class="grid gauto">
+{% for s in SUBJ %}{% set lv = levels[s.code] %}{% set p = prog.get(s.code, {}) %}
+<a class="card scard" href="/subject/{{ s.code }}" style="--c:{{ s.color }}">
+  <div class="row"><div class="badge" style="--c:{{ s.color }}">{{ s.glyph }}</div><div class="grow"><div class="nm">{{ s.name }}</div><div class="small muted">Lv {{ lv.level }} · {{ lv.title }}</div></div>
+    {{ m.ring(lv.pct, lv.level, s.color, 48) }}</div>
+  <div class="bar sm"><i style="width:{{ (p.get('mastered',0))|pct(p.get('total',1)) }}%;background:{{ s.color }}"></i></div>
+  <div class="kv"><div><b>{{ p.get('mastered',0) }}</b>mastered</div><div><b>{{ p.get('total',0) }}</b>in bank</div><div><b>{{ (p.acc ~ '%') if p.get('acc') is not none else '—' }}</b>accuracy</div></div>
+</a>{% endfor %}
+</div>
+
+<div class="sech"><div><h2 class="h2">Today's missions</h2><p>Quick wins to keep your streak and climb levels</p></div></div>
+<div class="grid g3">
+  <div class="card flat">
+    <div class="row"><div class="badge" style="--c:#f59e0b">{{ m.ic('bolt') }}</div><div><b>Daily DPP</b><div class="small muted">10 mixed questions · all subjects</div></div></div>
+    <form method="post" action="/start/dpp" style="margin-top:16px"><input type="hidden" name="n" value="10"><input type="hidden" name="title" value="Daily DPP">
+      <button class="btn pri block">Start practice {{ m.ic('arrow') }}</button></form>
+  </div>
+  <div class="card flat">
+    <div class="row"><div class="badge" style="--c:#7c5cff">{{ m.ic('test') }}</div><div><b>{{ nxt_full.title if nxt_full else 'All full mocks done' }}</b><div class="small muted">{% if nxt_full %}65 questions · 3 hours · 100 marks{% else %}Retake any from Tests{% endif %}</div></div></div>
+    {% if nxt_full %}{% if nxt_full.unlocked %}
+    <form method="post" action="/start/test/{{ nxt_full.id }}" style="margin-top:16px"><button class="btn pri block">{{ 'Resume' if nxt_full.running else 'Start full mock' }} {{ m.ic('arrow') }}</button></form>
+    {% else %}<div class="btn block off" style="margin-top:16px">{{ m.ic('lock') }} Unlocks at overall Level {{ nxt_full.unlock_level }}</div>{% endif %}{% endif %}
+  </div>
+  <div class="card flat">
+    <div class="row"><div class="badge" style="--c:#fb7185">{{ m.ic('target') }}</div><div><b>Fix your weak spots</b><div class="small muted">Lowest accuracy topics</div></div></div>
+    <div style="margin-top:12px;display:grid;gap:8px">
+    {% for w in weak %}<form method="post" action="/start/dpp" class="row sp small"><input type="hidden" name="subject" value="{{ w.subject }}"><input type="hidden" name="topic" value="{{ w.topic }}">
+      <span class="grow" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ w.topic }}</span><span class="muted">{{ w.c|pct(w.n) }}%</span><button class="btn sm">Drill</button></form>
+    {% else %}<div class="small muted">Answer a few questions and your weakest topics will show up here.</div>{% endfor %}</div>
+  </div>
+</div>
+
+<div class="grid g2" style="margin-top:34px">
+  <div class="card flat"><div class="row sp"><h2 class="h2">Credits this week</h2></div>
+    {% set mx = (week.values()|max) if week else 1 %}
+    <div class="bars" style="margin-top:20px">
+    {% for d in week_days %}{% set v = week.get(d, 0) %}<div style="height:{{ [4, (v / mx * 100)]|max }}%" data-t="{{ d[5:] }} · {{ v }} cr"></div>{% endfor %}
+    </div>
+    <div class="row sp small muted" style="margin-top:8px"><span>{{ week_days[0][5:] }}</span><span>today</span></div></div>
+  <div class="card flat"><h2 class="h2">Recent activity</h2>
+    <table class="t" style="margin-top:8px">{% for a in recent %}<tr onclick="location='/result/{{ a.id }}'" style="cursor:pointer"><td><b>{{ a.title }}</b><div class="small muted">{{ a.submitted_at[:16].replace('T',' ') }}</div></td>
+      <td style="text-align:right">{{ '%g'|format(a.score) }}/{{ '%g'|format(a.max_marks) }}<div class="small" style="color:var(--bolt,#fbbf24)">+{{ a.credits }} cr</div></td></tr>
+    {% else %}<tr><td class="muted">Nothing yet — start your first DPP!</td></tr>{% endfor %}</table></div>
+</div>
+{% endblock %}

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en" data-theme="{{ ui.theme }}" data-size="{{ ui.size }}" data-density="{{ ui.density }}" data-side="full">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{ a.title }} · GATE Prep</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/katex/katex.min.css') }}">
+<script src="{{ url_for('static', filename='vendor/katex/katex.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/math.js') }}" defer></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/exam.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cbt.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/themes.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ui.css') }}">
+<script src="{{ url_for('static', filename='js/ui.js') }}" defer></script>
+</head>
+<body class="cbt x-{{ a.mode }}">
+<div id="boot" class="bootwrap"><div class="bootcard"><div class="muted">Loading…</div></div></div>
+
+<div id="exam" hidden>
+ <header class="xbar">
+  <button class="xexit" data-exit title="Leave — progress is saved">← Exit</button>
+  <div class="xtitle"><b id="xTitle"></b><span id="xSub"></span></div>
+  <div class="grow"></div>
+  <button class="xb" id="calcBtn" title="Calculator">Calculator</button>
+  <button class="xb" data-ui="fullscreen" title="Full screen (F11)">⛶ Full screen</button>
+  <div class="timer" id="timer">--:--:--</div>
+  <button class="xsubmit" id="submitBtn">Submit test</button>
+ </header>
+ <div class="xsec" id="secTabs"></div>
+ <div class="xbody">
+  <main>
+   <div class="qpanel">
+    <div class="qhead"><b id="qnum">Question 1</b><div class="qtags"><span class="qtimer" id="qtime"></span><span class="tag" id="qtype">MCQ</span><span class="tag" id="qmarks">+1</span></div></div>
+    <div class="qtext" id="qtext"></div>
+    <div id="opts" class="opts"></div>
+    <div class="qtip" id="qtip"></div>
+   </div>
+   <div class="actions">
+    <button class="btn" id="markBtn">Mark for review &amp; next</button>
+    <button class="btn" id="clearBtn">Clear response</button>
+    <button class="btn" id="unBtn" title="Jump to the next question you have not answered">Next unanswered ⇥</button>
+    <div class="grow"></div>
+    <button class="btn" id="prevBtn">← Previous</button>
+    <button class="btn pri" id="nextBtn">Save &amp; next →</button>
+   </div>
+  </main>
+  <aside class="palette">
+   <div class="psec" id="palSec"></div>
+   <div id="palette" class="pgrid"></div>
+   <div class="legend"><span><i class="pal answered"></i>Answered</span><span><i class="pal notans"></i>Not answered</span><span><i class="pal notvis"></i>Not visited</span><span><i class="pal marked"></i>Marked for review</span><span><i class="pal ansmarked"></i>Answered &amp; marked</span></div>
+   <div class="pcount">Answered <b id="cA">0</b> / <span id="cT">0</span>{% if strict %} · Violations <b id="cV" style="color:var(--bad)">0</b>{% endif %}</div>
+  </aside>
+ </div>
+</div>
+
+<div id="prac" hidden>
+ <header class="xbar">
+  <button class="xexit" data-exit title="Leave — progress is saved, resume any time">← Exit</button>
+  <div class="xtitle"><b id="pTitle"></b><span id="pSub"></span></div>
+  <div class="grow"></div>
+  <span class="chip" id="pTimer" hidden>Time left <b>30:00</b></span>
+  <span class="chip" id="combo" style="display:none">Streak <span>0</span></span>
+  <span class="chip bolt">+<b id="sesCr">0</b> credits this session</span>
+  <button class="xsubmit" id="pFinishBtn">Finish &amp; results</button>
+ </header>
+ <div class="xbody">
+  <main>
+   <div class="qpanel">
+    <div class="qhead"><b id="pnum">Question 1</b><div class="qtags" id="pmeta"></div></div>
+    <div class="qtext" id="pqtext"></div>
+    <div id="popts" class="opts"></div>
+    <div id="pfb" class="fb" hidden></div>
+   </div>
+   <div class="actions">
+    <button class="btn" id="pskip">Skip</button><span class="muted small mono" id="ptime">0:00</span>
+    <div class="grow"></div>
+    <button class="btn pri" id="pcheck" disabled>Check answer</button>
+    <button class="btn pri" id="pnext" hidden>Next →</button>
+   </div>
+   <div class="qtip"><kbd>1</kbd>–<kbd>4</kbd> choose · <kbd>Enter</kbd> check / next</div>
+  </main>
+  <aside class="palette">
+   <div class="psec">Questions</div>
+   <div id="pPal" class="pgrid"></div>
+   <div class="legend"><span><i class="pal correct"></i>Correct</span><span><i class="pal wrong"></i>Wrong</span><span><i class="pal notvis"></i>Not attempted</span></div>
+   <div class="pcount">Attempted <b id="pA">0</b> / <span id="pT">0</span></div>
+  </aside>
+ </div>
+</div>
+
+<div id="toast"></div>
+<div id="calc" class="calc" hidden><div class="row sp"><b>Calculator</b><button class="xb" id="calcX">✕</button></div>
+ <input id="calcIn" placeholder="(2+3)*4, sqrt(2), 2^10, log(100)" autocomplete="off"><div id="calcOut" class="mono">= </div>
+ <div class="small muted">sin cos tan sqrt log(10) ln abs pi e ^ — Enter to evaluate</div></div>
+<div class="modal" id="subModal"><div class="box" style="text-align:left"><h2 class="h2">Review before you submit</h2><div id="sumGrid" class="sumgrid"></div><div id="revTab"></div>
+ <div class="revacts"><button class="btn sm" id="revUn">Go to unanswered</button><button class="btn sm" id="revMk">Go to marked for review</button></div>
+ <div class="row" style="margin-top:20px"><button class="btn pri grow" id="doSubmit">Yes, submit</button><button class="btn grow" id="cancelSubmit">Keep working</button></div></div></div>
+<div class="modal" id="fsWarn"><div class="box"><h2 class="h2" style="color:var(--bad)">You left fullscreen</h2><p class="muted">Violation <b id="vcount">1</b> of 5 recorded.</p><button class="btn pri" id="fsBack">Return to fullscreen</button></div></div>
+
+<script>window.ATT={id:"{{ a.id }}",mode:"{{ a.mode }}",kind:"{{ a.kind }}",strict:{{ 'true' if strict else 'false' }}};</script>
+<script src="{{ url_for('static', filename='js/exam.js') }}"></script>
+</body></html>

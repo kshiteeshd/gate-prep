@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% import "_m.html" as m %}
+{% block title %}History · GATE Prep{% endblock %}
+{% block body %}
+<div class="row sp wrap"><h1 class="h1">History</h1>
+ <div class="row" style="gap:8px">{% for k, l in (('', 'All'), ('dpp','Practice'), ('small','Small'), ('sfull','Full test'), ('full','GATE mock'), ('legacy','Earlier')) %}<a class="chip" href="/history?kind={{ k }}" {% if kind==k %}style="border-color:var(--acc)"{% endif %}>{{ l }}</a>{% endfor %}</div></div>
+<div class="card flat" style="margin-top:18px;padding:6px 8px"><table class="t">
+<tr><th>Attempt</th><th>Type</th><th>Score</th><th>✔ / ✘ / —</th><th>Time</th><th>Credits</th></tr>
+{% for a in atts %}<tr onclick="location='/result/{{ a.id }}'" style="cursor:pointer">
+ <td><b>{{ a.title }}</b><div class="small muted">{{ a.submitted_at[:16].replace('T',' ') }}</div></td>
+ <td><span class="tag">{{ a.kind }}</span></td>
+ <td><b>{{ '%g'|format(a.score) }}</b> / {{ '%g'|format(a.max_marks) }}</td>
+ <td><span style="color:var(--ok)">{{ a.correct }}</span> / <span style="color:var(--bad)">{{ a.wrong }}</span> / <span class="muted">{{ a.skipped }}</span></td>
+ <td>{{ a.used_sec|fmt_time }}</td><td style="color:#fbbf24;font-weight:700">+{{ a.credits }}</td></tr>
+{% else %}<tr><td class="muted" colspan="6">No attempts yet.</td></tr>{% endfor %}</table></div>
+{% endblock %}

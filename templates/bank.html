@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ d.pretty }} — {{ d.subject }}{% endblock %}
+{% block body %}
+<div class="card pagehead">
+  <p class="muted text-xs" style="margin:0 0 4px"><a href="/" class="muted">Library</a> / <a href="/subject/{{ d.subject }}" class="muted">{{ d.subject }}</a> / {{ d.pretty }}</p>
+  <h1>{{ d.pretty }}</h1>
+  <p class="muted text-sm" style="margin:6px 0 0">{{ d.questions|length }} questions in bank · {{ nattempts }} attempts · sampling: <b>unseen → mistakes → attempted</b></p>
+  <div class="flex items-center gap-2 flex-wrap" style="margin-top:10px">
+    <span class="chip">{{ prog.unseen }} unseen</span>
+    <span class="chip chip-nat">{{ prog.wrong }} need work</span>
+    <span class="chip chip-marks">{{ prog.right }} mastered</span>
+    <div class="rounded" style="flex:1;min-width:140px;height:10px;background:var(--panel2);border:1px solid var(--line);overflow:hidden">
+      <div style="display:flex;height:100%">
+        <div style="width:{{ (prog.right/prog.total*100) if prog.total else 0 }}%;background:#43a047"></div>
+        <div style="width:{{ (prog.wrong/prog.total*100) if prog.total else 0 }}%;background:#f9a825"></div>
+      </div>
+    </div>
+  </div>
+  <div class="grid md:grid-cols-2 gap-3" style="margin-top:16px">
+    <form action="/start" method="post" class="card" style="padding:18px">
+      <input type="hidden" name="kind" value="bank"><input type="hidden" name="subject" value="{{ scope.subject }}">
+      <input type="hidden" name="subdir" value="{{ scope.subdir }}"><input type="hidden" name="bank" value="{{ scope.bank }}">
+      <input type="hidden" name="mode" value="sprint">
+      <div class="flex items-center justify-between"><b style="font-size:1.05rem">⚡ Sprint</b><span class="chip">{{ sprint_n }}Q · {{ sprint_t }} min</span></div>
+      <p class="muted text-xs" style="margin:8px 0 12px">MCQ · MSQ · NAT with GATE marking. CBT interface, auto-submit.</p>
+      <button class="btn btn-p" style="width:100%;padding:13px">Start Sprint →</button>
+    </form>
+    <form action="/start" method="post" class="card" style="padding:18px">
+      <input type="hidden" name="kind" value="bank"><input type="hidden" name="subject" value="{{ scope.subject }}">
+      <input type="hidden" name="subdir" value="{{ scope.subdir }}"><input type="hidden" name="bank" value="{{ scope.bank }}">
+      <input type="hidden" name="mode" value="full">
+      <div class="flex items-center justify-between"><b style="font-size:1.05rem">📝 Full Mock</b><span class="chip">{{ full_n }}Q · {{ full_t }} min</span></div>
+      <p class="muted text-xs" style="margin:8px 0 12px">Exam-grade simulation on this subtopic. Violations are logged.</p>
+      <button class="btn btn-g" style="width:100%;padding:13px">Start Full Mock →</button>
+    </form>
+  </div>
+  <div style="margin-top:12px"><a href="/history/bank/{{ scope.subject }}/{{ scope.subdir }}/{{ scope.bank }}" class="btn btn-d">📈 Bank History</a></div>
+</div>
+<div class="card" style="padding:16px 20px">
+  <b class="text-sm">Marking scheme</b>
+  <p class="muted text-xs" style="margin:6px 0 0"><span class="chip chip-mcq">MCQ</span> full marks correct · negative on wrong &nbsp; <span class="chip chip-msq">MSQ</span> exact match only · no negative &nbsp; <span class="chip chip-nat">NAT</span> value ± tolerance · no negative</p>
+</div>
+{% endblock %}

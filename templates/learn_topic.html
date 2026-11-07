@@ -1,0 +1,110 @@
+{% extends "base.html" %}{% import "_m.html" as m %}
+{% block title %}{{ l.title }} · Learn · GATE Prep{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/learn.css') }}">{% endblock %}
+{% block body %}
+{% set secs = l.sections|length %}
+<div class="lwrap">
+<article id="article">
+ <div class="lhero">
+  <div class="row sp wrap"><span class="tag">Chapter {{ l.ch_no }} · {{ l.chapter }}</span>
+   <button class="btn sm" id="outlineBtn">☰ Course outline</button></div>
+  <h1>{{ l.title }}</h1>
+  <p class="sub">{{ l.key }}</p>
+  <div class="meta"><span>⏱ {{ l.minutes }} min</span>{% if l.widget != 'none' %}<span>🧪 interactive tool</span>{% endif %}<span>📘 {{ l.examples|length }} worked example{{ 's' if l.examples|length != 1 }}</span><span>🎯 GATE weight {{ '★' * l.weight }}{{ '☆' * (5 - l.weight) }}</span></div>
+ </div>
+ <div class="card outline" id="outline" hidden>
+  {% for no, name, ls in tree %}<div class="oc"><b>{{ no }}. {{ name }}</b>
+   {% for x in ls %}<a href="/learn/{{ s.code }}/{{ x.slug }}" class="{{ 'cur' if x.slug == l.slug }}"><span class="dot {{ 'done' if x.slug in done }}">{% if x.slug in done %}<svg class="i"><use href="#i-check"/></svg>{% endif %}</span>{{ x.title }}</a>{% endfor %}</div>{% endfor %}
+ </div>
+
+ {% set n = namespace(i=1) %}
+ <section class="sec" id="s-idea"><div class="sh"><div class="num">{{ n.i }}</div><h2>The idea in one line</h2></div>
+  <div class="callout key"><div class="ic">💡</div><div><b class="t">Key idea</b>{{ l.key }}</div></div>
+  {% if l.analogy %}<div class="card analogy"><div class="em">{{ l.analogy[0] }}</div><div><b>{{ l.analogy[1] }}</b><div class="muted" style="margin-top:4px">{{ l.analogy[2]|md }}</div></div></div>{% endif %}
+ </section>
+ {% set n.i = n.i + 1 %}
+
+ {% if l.book %}
+ <section class="sec book" id="s-book"><div class="sh"><div class="num">{{ n.i }}</div><h2>Learn it from scratch</h2></div>
+  <p class="muted" style="margin-top:-4px">Read this part top to bottom like a textbook chapter. Nothing is assumed — new terms are explained where they first appear.</p>
+  {% for h, body in l.book %}<h3 class="bk">{{ h }}</h3>{{ body|md }}{% endfor %}</section>
+ {% set n.i = n.i + 1 %}
+ {% endif %}
+
+ {% for sec in l.sections %}
+ <section class="sec" id="s-{{ loop.index }}"><div class="sh"><div class="num">{{ n.i }}</div><h2>{{ sec.h }}</h2></div>
+  {{ sec.md|md }}
+  {% for f in sec.get('formulas', []) %}<div class="formula"><div class="texd" data-tex="{{ f[0]|tex }}">{{ f[0] }}</div>{% if f[1] %}<small>{{ f[1] }}</small>{% endif %}</div>{% endfor %}
+  {% for c in sec.get('call', []) %}<div class="callout {{ c[0] }}"><div class="ic">{{ {'key':'💡','tip':'⚡','warn':'⚠️','trap':'🪤'}[c[0]] }}</div><div><b class="t">{{ c[1] }}</b>{{ c[2]|md }}</div></div>{% endfor %}
+ </section>
+ {% set n.i = n.i + 1 %}
+ {% endfor %}
+
+ {% if l.widget != 'none' %}
+ <section class="sec" id="s-try"><div class="sh"><div class="num">{{ n.i }}</div><h2>Try it yourself</h2></div>
+  {% if l.get('widget_hint') %}<p class="muted">{{ l.widget_hint }}</p>{% endif %}
+  <div class="card wgt" data-w="{{ l.widget }}"></div></section>
+ {% set n.i = n.i + 1 %}
+ {% endif %}
+
+ {% if l.examples %}
+ <section class="sec" id="s-ex"><div class="sh"><div class="num">{{ n.i }}</div><h2>Worked examples</h2></div>
+  {% for e in l.examples %}
+  <div class="card" style="margin:12px 0"><span class="tag">Example {{ loop.index }}</span> <b>{{ e.title }}</b><div style="margin-top:8px">{{ e.problem|md }}</div>
+   <details><summary>Show the solution step by step</summary><div class="bd"><ol class="steps">{% for st in e.steps %}<li><div>{{ st|md }}</div></li>{% endfor %}</ol>
+    <div class="callout tip" style="margin-bottom:0"><div class="ic">✅</div><div><b class="t">Answer</b>{{ e.answer|md }}</div></div></div></details></div>
+  {% endfor %}</section>
+ {% set n.i = n.i + 1 %}
+ {% endif %}
+
+ {% if l.proofs %}
+ <section class="sec" id="s-proofs"><div class="sh"><div class="num">{{ n.i }}</div><h2>Proofs and derivations</h2></div>
+  {% for p in l.proofs %}<div class="deep"><h3>{{ p[0] }}</h3>{{ p[1]|md }}</div>{% endfor %}</section>
+ {% set n.i = n.i + 1 %}
+ {% endif %}
+
+ {% if l.notes %}
+ <section class="sec" id="s-notes"><div class="sh"><div class="num">{{ n.i }}</div><h2>Detailed notes</h2></div>
+  {% for p in l.notes %}<div class="deep"><h3>{{ p[0] }}</h3>{{ p[1]|md }}</div>{% endfor %}</section>
+ {% set n.i = n.i + 1 %}
+ {% endif %}
+
+ {% if l.traps %}
+ <section class="sec" id="s-traps"><div class="sh"><div class="num">{{ n.i }}</div><h2>Common mistakes (GATE traps)</h2></div>
+  <div class="grid g2">{% for t in l.traps %}<div class="callout trap"><div class="ic">🪤</div><div><b class="t">{{ t[0] }}</b>{{ t[1]|md }}</div></div>{% endfor %}</div></section>
+ {% set n.i = n.i + 1 %}
+ {% endif %}
+
+ {% if l.quick %}
+ <section class="sec" id="s-quick"><div class="sh"><div class="num">{{ n.i }}</div><h2>Quick check</h2></div>
+  <p class="muted">Instant questions to lock the idea in.</p>
+  {% for q in l.quick %}<div class="card q quick" data-a="{{ q[2] }}" data-e="{{ q[3] }}"><b>{{ q[0]|mdi }}</b>
+   {% for o in q[1] %}<button class="opt" data-i="{{ loop.index0 }}"><span class="k">{{ 'ABCDE'[loop.index0] }}</span><span>{{ o }}</span></button>{% endfor %}<div class="fb"></div></div>{% endfor %}</section>
+ {% set n.i = n.i + 1 %}
+ {% endif %}
+
+ <section class="sec" id="s-practice"><div class="sh"><div class="num">{{ n.i }}</div><h2>GATE-level practice</h2></div>
+  <div class="card row sp wrap" style="margin-bottom:6px"><div class="row"><b>Your score</b><span class="chip" id="scoreChip">0 / {{ practice|length }} correct</span><span class="chip">⚡ <b id="earned">0</b> credits</span></div>
+   <span class="muted small">Easy +2 · Medium +4 · Hard +7 credits (repeat answers +1)</span></div>
+  {% for q in practice %}
+  <div class="card q prac" data-id="{{ q.id }}" data-type="{{ q.qtype }}">
+   <div class="qh"><div class="row" style="gap:8px"><b>Q{{ loop.index }}</b><span class="tag {{ q.diff }}">{{ q.diff }}</span><span class="tag">{{ {'single':'MCQ','multiple':'MSQ','numerical':'NAT'}[q.qtype] }}</span><span class="tag">{{ '%g'|format(q.marks) }} mark{{ 's' if q.marks != 1 }}</span></div></div>
+   <div class="qtext">{{ q.text|rt }}</div>
+   <div style="margin-top:10px">{% if q.qtype == 'numerical' %}<input class="nat" type="number" step="any" placeholder="Your answer">{% else %}{% for o in q.options %}<button class="opt {{ 'multi' if q.qtype == 'multiple' }}" data-i="{{ loop.index0 }}"><span class="k">{{ 'ABCDEFGH'[loop.index0] }}</span><span>{{ o|rt }}</span></button>{% endfor %}{% endif %}</div>
+   <div class="row" style="margin-top:12px"><button class="btn pri sm chk">Check answer</button></div><div class="fb"></div></div>
+  {% else %}<p class="muted">No practice questions for this topic yet.</p>{% endfor %}
+  <div class="row wrap" style="margin-top:8px">{% if topic_row %}<a class="btn" href="/topic/{{ topic_row.id }}">More practice on this topic →</a>{% endif %}<a class="btn" href="/subject/{{ s.code }}/practice">All {{ s.code }} DPPs</a></div></section>
+ {% set n.i = n.i + 1 %}
+
+ <section class="sec" id="s-sum"><div class="sh"><div class="num">{{ n.i }}</div><h2>Summary — cheat sheet</h2></div>
+  <div class="card"><ul style="margin:0;padding-left:20px;display:grid;gap:6px">{% for b in l.summary %}<li>{{ b|mdi }}</li>{% endfor %}</ul></div>
+  <div class="card row sp wrap" style="margin-top:16px"><div><b>Finished this topic?</b><div class="muted small">Mark it complete to earn <b>+20 credits</b>.</div></div>
+   <button class="btn pri" id="complete" data-slug="{{ l.slug }}" data-done="{{ 1 if l.slug in done else 0 }}">{{ '✔ Completed' if l.slug in done else '✔ Mark as complete' }}</button></div>
+  <div class="next">{% if prev %}<a class="btn" href="/learn/{{ s.code }}/{{ prev.slug }}">← {{ prev.title }}</a>{% else %}<span></span>{% endif %}{% if nxt %}<a class="btn pri" href="/learn/{{ s.code }}/{{ nxt.slug }}">Next: {{ nxt.title }} →</a>{% endif %}</div></section>
+</article>
+<nav class="toc"><h4>On this page</h4>
+ <a data-s="s-idea">The idea</a>{% if l.book %}<a data-s="s-book">Learn it from scratch</a>{% endif %}{% for sec in l.sections %}<a data-s="s-{{ loop.index }}">{{ sec.h }}</a>{% endfor %}{% if l.widget != 'none' %}<a data-s="s-try">Try it yourself</a>{% endif %}{% if l.examples %}<a data-s="s-ex">Worked examples</a>{% endif %}{% if l.proofs %}<a data-s="s-proofs">Proofs and derivations</a>{% endif %}{% if l.notes %}<a data-s="s-notes">Detailed notes</a>{% endif %}{% if l.traps %}<a data-s="s-traps">Common mistakes</a>{% endif %}{% if l.quick %}<a data-s="s-quick">Quick check</a>{% endif %}<a data-s="s-practice">GATE practice</a><a data-s="s-sum">Summary</a></nav>
+</div>
+<div id="toast"></div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/learn.js') }}"></script><script src="{{ url_for('static', filename='js/learn_cs.js') }}"></script><script src="{{ url_for('static', filename='js/learn_dbos.js') }}"></script><script src="{{ url_for('static', filename='js/learn_toc.js') }}"></script><script src="{{ url_for('static', filename='js/learn_hw.js') }}"></script><script src="{{ url_for('static', filename='js/learn_net.js') }}"></script>{% endblock %}

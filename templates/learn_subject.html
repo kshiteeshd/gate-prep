@@ -1,0 +1,17 @@
+{% extends "base.html" %}{% import "_m.html" as m %}
+{% block title %}Learn {{ s.name }} · GATE Prep{% endblock %}
+{% block body %}
+<div class="row sp wrap"><div class="row"><div class="badge" style="--c:{{ s.color }};width:60px;height:60px;border-radius:18px;font-size:1.2rem">{{ s.glyph }}</div><div><h1 class="h1">{{ s.name }}</h1><div class="muted">Learning modules</div></div></div>
+  <div class="row"><a class="btn" href="/subject/{{ s.code }}/practice">Practice DPPs</a><a class="btn" href="/subject/{{ s.code }}/test">Take a test</a></div></div>
+{% if nl %}<div class="cont" style="margin-top:var(--s5)"><a class="citem" href="/learn/{{ s.code }}/{{ nl.slug }}"><span class="ck">Continue learning</span><b>{{ nl.title }}</b><span class="go">{{ nl.minutes }} min {{ m.ic('arrow') }}</span></a></div>{% else %}<p class="muted" style="margin-top:var(--s5)">Every lesson in this subject is finished. Keep it fresh with practice.</p>{% endif %}
+{% for no, name, lessons in tree %}{% set nd = lessons|selectattr('slug','in',done)|list|length %}
+<div class="sech" style="margin-top:34px"><div class="row"><div class="badge sm" style="--c:{{ s.color }}">{{ no }}</div><div><h2 class="h2">{{ name }}</h2><p>{{ lessons|length }} lesson{{ 's' if lessons|length != 1 }} · ~{{ lessons|sum(attribute='minutes') }} min</p></div></div><div class="chprog"><span class="mono small">{{ nd }}/{{ lessons|length }} done</span><div class="bar sm"><i style="width:{{ (nd * 100 / lessons|length)|round|int }}%"></i></div></div></div>
+{% for l in lessons %}
+<a class="tli" href="/learn/{{ s.code }}/{{ l.slug }}">
+  <span class="dot {{ 'done' if l.slug in done }}" style="width:26px;height:26px">{% if l.slug in done %}<svg class="i"><use href="#i-check"/></svg>{% endif %}</span>
+  <div class="grow"><b>{{ l.title }}</b><div class="muted small">{{ l.minutes }} min{% if l.widget != 'none' %} · interactive tool{% endif %} · {{ l.examples|length }} worked example{{ 's' if l.examples|length != 1 }} · GATE weight {{ '★' * l.weight }}{{ '☆' * (5 - l.weight) }}</div></div>
+  <span class="small muted">{{ l.topic }}</span></a>
+{% endfor %}{% else %}
+<div class="card" style="margin-top:24px"><b>Lessons for {{ s.name }} are being written.</b><p class="muted" style="margin:6px 0 0">Meanwhile, practise with the topic-wise DPPs.</p></div>
+{% endfor %}
+{% endblock %}

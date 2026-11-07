@@ -1,0 +1,5 @@
+section,question,type,option_a,option_b,option_c,option_d,correct,marks,negative,tolerance,topic,difficulty
+General Aptitude,2+2 equals?,single,3,4,5,6,B,1,0.33,,Aptitude,easy
+General Aptitude,Which are prime?,multiple,2,3,4,5,"A,B,D",2,0,,Maths,medium
+Computer Science,Value of g (m/s^2)?,numerical,,,,,9.81,2,0,0.02,Physics,hard
+Computer Science,TCP is?,single,Connectionless,Connection-oriented,Stateless,Unreliable,B,2,0.66,,Networks,easy

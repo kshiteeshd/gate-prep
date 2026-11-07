@@ -1,0 +1,19 @@
+{% extends "base.html" %}{% import "_m.html" as m %}
+{% block title %}{{ s.code }} practice · GATE Prep{% endblock %}
+{% block body %}
+<div class="row sp wrap"><div class="row"><div class="badge" style="--c:{{ s.color }}">{{ s.glyph }}</div>
+  <div><h1 class="h1">{{ s.name }} · Practice</h1><p class="muted" style="margin:2px 0 0">Topic-wise DPPs · 30 questions · 30 minutes each · instant feedback with explanations</p></div></div>
+  <form method="post" action="/start/dpp"><input type="hidden" name="subject" value="{{ s.code }}"><input type="hidden" name="n" value="15"><input type="hidden" name="title" value="{{ s.code }} · Quick mixed practice"><button class="btn sm">⚡ Quick 15-question mix</button></form></div>
+{% for t in topics %}
+<div class="sech" style="margin-top:30px"><div><h2 class="h2">{{ t.name }}</h2><p>{{ t.dpps|length }} DPP{{ 's' if t.dpps|length != 1 }} · {{ t.done }} completed</p></div></div>
+<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(190px,1fr))">
+{% for d in t.dpps %}
+  <div class="card dtile {{ 'done' if d.done }}" style="--c:{{ s.color }}">
+    <div class="row sp"><span class="no">DPP {{ d.no }}</span>{% if d.done %}<span style="color:var(--ok)">{{ m.ic('check') }}</span>{% endif %}</div>
+    <div class="meta"><span>{{ d.n }} Q</span><span>{{ d.minutes }} min</span></div>
+    {% if d.done %}<div class="small" style="color:var(--ok)">Best {{ d.done.bc }}/{{ d.n }} correct · ×{{ d.done.n }}</div>{% else %}<div class="small muted">Not attempted</div>{% endif %}
+    <form method="post" action="/start/test/{{ d.id }}"><button class="btn sm block {{ 'pri' if not d.done or d.running else '' }}">{{ 'Resume' if d.running else ('Redo' if d.done else 'Start') }}</button></form>
+  </div>
+{% endfor %}</div>
+{% else %}<p class="muted" style="margin-top:20px">No DPPs yet.</p>{% endfor %}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% import "_m.html" as m %}
+{% block title %}{{ s.code }} tests · GATE Prep{% endblock %}
+{% block body %}
+<div class="row"><div class="badge" style="--c:{{ s.color }}">{{ s.glyph }}</div><div><h1 class="h1">{{ s.name }} · Tests</h1><p class="muted" style="margin:2px 0 0">Mixed topics, timed, results with full explanations. Unlock more by levelling up in {{ s.code }} (you are Level {{ lv.level }}).</p></div></div>
+<div class="grid g2" style="margin-top:26px">
+  <a class="card choice" href="/subject/{{ s.code }}/test/small" style="--c:{{ s.color }}">
+    <div class="ci">{{ m.ic('bolt') }}</div>
+    <h2 class="h1" style="font-size:1.6rem">Small test</h2>
+    <p class="muted">A quick check of the whole subject.</p>
+    <div class="row" style="gap:26px;margin:6px 0"><div class="kv"><div><b>30</b>questions</div><div><b>30 min</b>time</div><div><b>~45</b>marks</div></div></div>
+    <div class="meta"><span>{{ info.small.n }} tests</span><span>{{ info.small.open }} unlocked</span><span style="color:var(--ok)">{{ info.small.done }} done</span></div>
+    <span class="btn pri" style="margin-top:18px">Choose a small test {{ m.ic('arrow') }}</span>
+  </a>
+  <a class="card choice" href="/subject/{{ s.code }}/test/sfull" style="--c:{{ s.color }}">
+    <div class="ci">{{ m.ic('trophy') }}</div>
+    <h2 class="h1" style="font-size:1.6rem">Full test</h2>
+    <p class="muted">A complete GATE-style paper on this subject.</p>
+    <div class="row" style="gap:26px;margin:6px 0"><div class="kv"><div><b>65</b>questions</div><div><b>2 hr</b>time</div><div><b>100</b>marks</div></div></div>
+    <div class="meta"><span>{{ info.sfull.n }} tests</span><span>{{ info.sfull.open }} unlocked</span><span style="color:var(--ok)">{{ info.sfull.done }} done</span></div>
+    <span class="btn pri" style="margin-top:18px">Choose a full test {{ m.ic('arrow') }}</span>
+  </a>
+</div>
+{% endblock %}

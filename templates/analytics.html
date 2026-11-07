@@ -1,0 +1,45 @@
+{% extends "base.html" %}{% import "_m.html" as m %}
+{% block title %}Analytics · GATE Prep{% endblock %}
+{% block body %}
+<h1 class="h1">Analytics</h1><p class="muted" style="margin:4px 0 22px">Where you stand, where to push.</p>
+<div class="grid g4">
+  {% for d in ('easy','medium','hard') %}{% set x = diffs.get(d) %}
+  <div class="card flat"><span class="tag {{ d }}">{{ d }}</span><div class="h1" style="margin:10px 0 2px">{{ ((x.c / x.n * 100)|round|int ~ '%') if x else '—' }}</div>
+    <div class="small muted">{{ x.n if x else 0 }} answered{% if x %} · avg {{ x.t|round|int }}s{% endif %}</div></div>{% endfor %}
+  <div class="card flat"><span class="tag">overall</span>{% set tn = diffs.values()|sum(attribute='n') %}{% set tc = diffs.values()|sum(attribute='c') %}
+    <div class="h1" style="margin:10px 0 2px">{{ ((tc / tn * 100)|round|int ~ '%') if tn else '—' }}</div><div class="small muted">{{ tn }} answered</div></div>
+</div>
+
+<div class="grid g2" style="margin-top:20px">
+  <div class="card flat"><h2 class="h2">Credits earned · last 30 days</h2>
+    {% set mx = (daily|map(attribute='c')|max) if daily else 1 %}
+    <div class="bars" style="margin-top:20px">{% for d in daily %}<div style="height:{{ [4, d.c / mx * 100]|max }}%" data-t="{{ d.day[5:] }} · {{ d.c }} cr"></div>{% else %}<span class="muted">No data yet</span>{% endfor %}</div></div>
+  <div class="card flat"><h2 class="h2">Test scores</h2>
+    {% if scores %}<div class="bars" style="margin-top:20px">{% for s in scores %}<div style="height:{{ [4, s.score / s.max_marks * 100]|max }}%" data-t="{{ s.title }} · {{ '%g'|format(s.score) }}/{{ '%g'|format(s.max_marks) }}"></div>{% endfor %}</div>
+    <div class="small muted" style="margin-top:8px">Score as % of maximum, oldest → newest</div>{% else %}<p class="muted">Take a test to see your trend.</p>{% endif %}</div>
+</div>
+
+<div class="sech"><div><h2 class="h2">Activity</h2><p>Last 5 weeks · {{ active_days }} active day{{ 's' if active_days != 1 }} · current streak {{ streak }}</p></div></div>
+<div class="cal"><div class="dow">{% for d in ('Mon','Tue','Wed','Thu','Fri','Sat','Sun') %}<span>{{ d }}</span>{% endfor %}</div>
+ <div class="cells">{% for c in cal %}<i class="l{{ c.lvl }}" title="{{ c.m }} · {{ c.c }} credits"></i>{% endfor %}</div>
+ <div class="small muted calkey">Less <i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i> More</div></div>
+
+<div class="sech"><div><h2 class="h2">Topic heat-map</h2><p>Every syllabus topic by accuracy · grey = not started · click to drill</p></div></div>
+<div class="heat">{% for h in heat %}<div class="hrow"><a class="hname" href="/subject/{{ h.s.code }}"><span class="dt" style="background:{{ h.s.color }}"></span>{{ h.s.name }}</a>
+ <div class="hcells">{% for c in h.cells %}<form method="post" action="/start/dpp"><input type="hidden" name="subject" value="{{ h.s.code }}"><input type="hidden" name="topic" value="{{ c.name }}"><button class="hc {{ 'h0' if c.acc is none else ('hb' if c.acc<40 else ('hm' if c.acc<70 else 'hg')) }}" title="{{ c.name }} · {{ (c.acc ~ '% of ' ~ c.n ~ ' solved') if c.acc is not none else 'not started' }}">{{ c.acc if c.acc is not none else '' }}</button></form>{% endfor %}</div></div>{% endfor %}
+ <div class="small muted calkey">Accuracy <i class="hc hb"></i> &lt;40% <i class="hc hm"></i> 40–69% <i class="hc hg"></i> 70%+ <i class="hc h0"></i> not started</div></div>
+
+<div class="sech"><div><h2 class="h2">Subject strength</h2></div></div>
+<div class="grid gauto">{% for s in SUBJ %}{% set p = prog.get(s.code, {}) %}{% set lv = G.subjects[s.code] %}
+<a href="/subject/{{ s.code }}" class="card flat row" style="gap:14px"><div class="badge sm" style="--c:{{ s.color }}">{{ s.glyph }}</div>
+ <div class="grow"><b>{{ s.code }}</b> <span class="muted small">Lv {{ lv.level }}</span><div class="bar sm" style="margin:7px 0 4px"><i style="width:{{ (p.get('acc') or 0) }}%;background:{{ s.color }}"></i></div>
+ <div class="small muted">{{ (p.acc ~ '% accuracy') if p.get('acc') is not none else 'no data' }} · {{ p.get('answered',0) }} solved</div></div></a>{% endfor %}</div>
+
+<div class="sech"><div><h2 class="h2">Topic accuracy</h2><p>Weakest first — drill these</p></div></div>
+<div class="card flat" style="padding:6px 8px"><table class="t"><tr><th>Subject</th><th>Topic</th><th>Solved</th><th>Accuracy</th><th>Avg time</th><th></th></tr>
+{% for t in topics %}<tr><td><b>{{ t.subject }}</b></td><td>{{ t.topic }}</td><td>{{ t.n }}</td>
+ <td style="width:200px"><div class="row" style="gap:10px"><div class="bar sm grow"><i style="width:{{ (t.c / t.n * 100)|round|int }}%;background:{{ 'var(--ok)' if t.c/t.n>=0.7 else ('var(--med)' if t.c/t.n>=0.4 else 'var(--bad)') }}"></i></div><span class="small">{{ (t.c / t.n * 100)|round|int }}%</span></div></td>
+ <td>{{ t.t|round|int }}s</td>
+ <td><form method="post" action="/start/dpp"><input type="hidden" name="subject" value="{{ t.subject }}"><input type="hidden" name="topic" value="{{ t.topic }}"><button class="btn sm">Drill</button></form></td></tr>
+{% else %}<tr><td class="muted">No answers recorded yet.</td></tr>{% endfor %}</table></div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}{% import "_m.html" as m %}
+{% block title %}{{ t.name }} · GATE Prep{% endblock %}
+{% block body %}
+<div class="row wrap sp"><div class="row"><div class="badge" style="--c:{{ s.color }}">{{ s.glyph }}</div><div><h1 class="h1">{{ t.name }}</h1><div class="muted">{{ s.name }}</div></div></div>
+  <div class="row" style="gap:12px"><div class="chip">{{ answered }} solved</div><div class="chip">{{ (acc ~ '%') if acc is not none else '—' }} accuracy</div></div></div>
+
+<form method="post" action="/start/dpp">
+ <input type="hidden" name="subject" value="{{ s.code }}"><input type="hidden" name="topic" value="{{ t.name }}">
+ <div class="card flat row wrap" style="margin-top:22px;gap:22px">
+  <div style="min-width:220px;flex:1"><label class="f" style="margin-top:0">Subtopic</label>
+   <select name="subtopic"><option value="">All subtopics</option>{% for x in subtopics %}<option value="{{ x.name if x.name!='General' else '' }}">{{ x.name }} ({{ x.n }})</option>{% endfor %}</select></div>
+  <div style="width:170px"><label class="f" style="margin-top:0">Questions</label>
+   <select name="n"><option>10</option><option>15</option><option>20</option><option>30</option><option>50</option></select></div>
+ </div>
+ <div class="grid g3" style="margin-top:18px">
+  {% for d, cr, col, lab in (('easy',2,'var(--easy)','Build your foundation'),('medium',4,'var(--med)','Exam-level questions'),('hard',7,'var(--hard)','Tricky, multi-step problems')) %}
+  {% set x = st.get(d) %}
+  <div class="card" style="border-top:3px solid {{ col }}">
+   <div class="row sp"><span class="tag {{ d }}">{{ d }}</span><span class="chip bolt">{{ m.ic('bolt') }}+{{ cr }} / correct</span></div>
+   <div class="muted" style="margin:14px 0 10px">{{ lab }}</div>
+   {% if x %}<div class="bar"><i style="width:{{ x.mastered|pct(x.total) }}%;background:{{ col }}"></i></div>
+   <div class="kv" style="margin:12px 0 18px"><div><b>{{ x.total }}</b>questions</div><div><b>{{ x.seen }}</b>attempted</div><div><b>{{ x.mastered }}</b>mastered</div></div>
+   <button class="btn pri block" name="diff" value="{{ d }}">Start {{ d }} DPP {{ m.ic('arrow') }}</button>
+   {% else %}<div class="muted small" style="margin:20px 0">No {{ d }} questions yet.</div><button class="btn block off" disabled>Unavailable</button>{% endif %}
+  </div>{% endfor %}
+ </div>
+ <div style="margin-top:14px"><button class="btn" name="diff" value="">Mixed difficulty DPP</button></div>
+</form>
+
+<div class="sech"><div><h2 class="h2">Other topics in {{ s.code }}</h2></div></div>
+<div class="row wrap" style="gap:8px">{% for o in others %}<a class="chip" href="/topic/{{ o.id }}" {% if o.id==t.id %}style="border-color:var(--acc)"{% endif %}>{{ o.name }}</a>{% endfor %}</div>
+{% endblock %}

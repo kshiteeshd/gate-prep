@@ -1,0 +1,26 @@
+{% macro ic(n) %}<svg class="i"><use href="#i-{{n}}"/></svg>{% endmacro %}
+{% macro ring(p, label, color, size=64) %}<div class="ring" style="--p:{{ p }};--c:{{ color }};--s:{{ size }}px"><span>{{ label }}</span></div>{% endmacro %}
+{% macro tcard(t) %}
+<div class="card tcard {{ 'locked' if not t.unlocked }} {{ 'done' if t.done }}">
+  {% if not t.unlocked %}<span class="lock"><svg class="i"><use href="#i-lock"/></svg></span>{% elif t.done %}<span class="lock" style="color:var(--ok)"><svg class="i"><use href="#i-check"/></svg></span>{% endif %}
+  <div class="no">{{ '%02d'|format(t.no) }}</div>
+  <div><b>{{ t.title }}</b></div>
+  <div class="meta"><span>{{ t.n }} questions</span><span>{{ t.minutes }} min</span>
+    {% if t.done %}<span style="color:var(--ok)">Best {{ '%g'|format(t.done.best) }}/{{ '%g'|format(t.done.mx) }} · ×{{ t.done.n }}</span>{% endif %}</div>
+  {% if t.unlocked %}
+  <form method="post" action="/start/test/{{ t.id }}"><button class="btn {{ 'pri' if not t.done or t.running else '' }} sm block">
+    {{ 'Resume' if t.running else ('Retake' if t.done else 'Start test') }}</button></form>
+  {% else %}<div class="small muted">Unlocks at <b>Level {{ t.unlock_level }}</b>{% if t.subject %} in {{ t.subject }}{% else %} overall{% endif %}</div>{% endif %}
+</div>
+{% endmacro %}
+{% macro dstart(subject, topic, stats, n=10, sub='') %}
+<form method="post" action="/start/dpp" class="dsplit">
+  <input type="hidden" name="subject" value="{{ subject }}"><input type="hidden" name="topic" value="{{ topic }}">
+  <input type="hidden" name="n" value="{{ n }}">
+  {% for d, cr in (('easy',2),('medium',4),('hard',7)) %}
+  {% set x = stats.get(d) %}
+  <button class="dbtn {{ d }}" name="diff" value="{{ d }}" {{ 'disabled' if not x }}>
+    <b>{{ d }}</b><small>{% if x %}{{ x.mastered }}/{{ x.total }} done · +{{ cr }}{% else %}no questions{% endif %}</small></button>
+  {% endfor %}
+</form>
+{% endmacro %}

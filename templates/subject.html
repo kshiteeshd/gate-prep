@@ -1,0 +1,49 @@
+{% extends "base.html" %}{% import "_m.html" as m %}
+{% block title %}{{ s.name }} · GATE Prep{% endblock %}
+{% block body %}
+<div class="card" style="--c:{{ s.color }};background:linear-gradient(135deg,color-mix(in srgb,{{ s.color }} 20%,var(--card)),var(--card))">
+  <div class="row wrap sp" style="gap:24px">
+    <div class="row" style="gap:18px"><div class="badge" style="--c:{{ s.color }};width:68px;height:68px;font-size:1.35rem;border-radius:20px">{{ s.glyph }}</div>
+      <div><h1 class="h1">{{ s.name }}</h1><div class="muted">{{ n_topics }} topics · {{ prog.get('total',0) }} practice questions · {{ prog.get('mastered',0) }} mastered</div></div></div>
+    <div class="row" style="gap:16px;min-width:300px">
+      {{ m.ring(lv.pct, lv.level, s.color, 70) }}
+      <div class="grow"><b>Level {{ lv.level }} · {{ lv.title }}</b>
+        <div class="bar" style="margin:8px 0 5px"><i style="width:{{ lv.pct }}%;background:{{ s.color }}"></i></div>
+        <div class="small muted">{{ lv.credits }} credits · {% if lv.max %}max level{% else %}{{ lv.to_next }} to Level {{ lv.level+1 }}{% endif %}</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="sech"><div><h2 class="h2">Next step</h2></div></div>
+<div class="cont">
+{% if weak %}<form method="post" action="/start/dpp" class="citem"><input type="hidden" name="subject" value="{{ s.code }}"><input type="hidden" name="topic" value="{{ weak.name }}"><span class="ck">Weakest topic · {{ weak.acc }}% accuracy</span><b>{{ weak.name }}</b><button class="go">Drill it {{ m.ic('arrow') }}</button></form>{% endif %}
+{% if nl %}<a class="citem" href="/learn/{{ s.code }}/{{ nl.slug }}"><span class="ck">Next lesson</span><b>{{ nl.title }}</b><span class="go">{{ nl.minutes }} min {{ m.ic('arrow') }}</span></a>{% endif %}
+<a class="citem" href="/subject/{{ s.code }}/practice"><span class="ck">Practice</span><b>{{ n_dpp }} topic-wise DPPs</b><span class="go">{{ done_dpp }} done {{ m.ic('arrow') }}</span></a>
+</div>
+
+<div class="sech"><div><h2 class="h2">Topics</h2><p>Lessons, DPPs and accuracy for every syllabus topic</p></div></div>
+<table class="t ttopics"><tr><th>Topic</th><th>Lessons</th><th>DPPs</th><th>Accuracy</th><th></th></tr>
+{% for r in rows %}<tr><td><b>{{ r.name }}</b></td>
+ <td class="mono">{{ r.ldone }}/{{ r.lessons }}</td><td class="mono">{{ r.ddone }}/{{ r.dpps }}</td>
+ <td style="width:220px">{% if r.acc is not none %}<div class="row" style="gap:10px"><div class="bar sm grow"><i style="width:{{ r.acc }}%;background:{{ 'var(--ok)' if r.acc>=70 else ('var(--med)' if r.acc>=40 else 'var(--bad)') }}"></i></div><span class="mono small">{{ r.acc }}%</span></div><div class="small muted">{{ r.n }} solved</div>{% else %}<span class="muted small">not started</span>{% endif %}</td>
+ <td style="text-align:right;white-space:nowrap">{% if r.next %}<a class="btn sm" href="/learn/{{ s.code }}/{{ r.next.slug }}">{{ 'Learn' if not r.ldone else 'Continue' }}</a> {% endif %}<form method="post" action="/start/dpp" style="display:inline"><input type="hidden" name="subject" value="{{ s.code }}"><input type="hidden" name="topic" value="{{ r.name }}"><button class="btn sm">Drill</button></form></td></tr>
+{% endfor %}</table>
+
+<div class="sech"><div><h2 class="h2">Practice and tests</h2></div></div>
+<div class="grid g2">
+  <a class="card choice" href="/subject/{{ s.code }}/practice" style="--c:{{ s.color }}">
+    <div class="ci">{{ m.ic('target') }}</div>
+    <h2 class="h1" style="font-size:1.6rem">Practice</h2>
+    <p class="muted">Topic-wise DPPs with instant feedback and explanations. Every DPP is <b>30 questions · 30 minutes</b>.</p>
+    <div class="meta"><span>{{ n_topics }} topics</span><span>{{ n_dpp }} DPPs</span><span style="color:var(--ok)">{{ done_dpp }} completed</span></div>
+    <span class="btn pri" style="margin-top:18px">Open DPPs {{ m.ic('arrow') }}</span>
+  </a>
+  <a class="card choice" href="/subject/{{ s.code }}/test" style="--c:{{ s.color }}">
+    <div class="ci">{{ m.ic('test') }}</div>
+    <h2 class="h1" style="font-size:1.6rem">Test</h2>
+    <p class="muted">Exam-mode, mixed topics. Choose a <b>Small test</b> (30 Q · 30 min) or a <b>Full test</b> (65 Q · 2 hr).</p>
+    <div class="meta"><span>{{ n_small }} small tests</span><span>{{ n_sfull }} full tests</span><span style="color:var(--ok)">{{ done_tests }} completed</span></div>
+    <span class="btn pri" style="margin-top:18px">Open tests {{ m.ic('arrow') }}</span>
+  </a>
+</div>
+{% endblock %}

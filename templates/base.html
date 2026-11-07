@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en" data-theme="{{ ui.theme }}" data-size="{{ ui.size }}" data-density="{{ ui.density }}" data-side="{{ ui.side }}">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}GATE Prep{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/katex/katex.min.css') }}">
+<script src="{{ url_for('static', filename='vendor/katex/katex.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/math.js') }}" defer></script>
+{% block head %}{% endblock %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/themes.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ui.css') }}">
+<script src="{{ url_for('static', filename='js/ui.js') }}" defer></script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+ <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></symbol>
+ <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+ <symbol id="i-test" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 14l2 2 4-4"/></symbol>
+ <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+ <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+ <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></symbol>
+ <symbol id="i-cog" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></symbol>
+ <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+ <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 22c4 0 7-3 7-7 0-3-2-5-3-7-1 2-2 3-4 3 1-3-1-6-3-8-1 4-4 6-4 11 0 4 3 8 7 8z"/></symbol>
+ <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+ <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></symbol>
+ <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+ <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></symbol>
+ <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z"/></symbol>
+ <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 19V5M9 7h6M9 11h6"/></symbol>
+ <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></symbol>
+ <symbol id="i-side" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></symbol>
+ <symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+ <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v9M6.5 6.5a8 8 0 1 0 11 0"/></symbol>
+ <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7M12 17h.01"/></symbol>
+ <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+</svg>
+{% macro ic(n) %}<svg class="i"><use href="#i-{{n}}"/></svg>{% endmacro %}
+<div class="app">
+ <aside class="side">
+  <a class="logo" href="/"><b>GP</b><span>GATE Prep<small>CS &amp; IT</small></span></a>
+  <nav class="nav" aria-label="Main">
+   <a href="/" class="{{ 'on' if nav_sec=='home' }}">{{ ic('home') }}<span class="lb">Home</span></a>
+   <a href="/learn" class="{{ 'on' if nav_sec=='learn' }}">{{ ic('book') }}<span class="lb">Learn</span></a>
+   <a href="/mocks" class="{{ 'on' if nav_sec=='mocks' }}">{{ ic('trophy') }}<span class="lb">Mock exams</span></a>
+   <div class="nsec">Subjects</div>
+   {% for s in SUBJ %}<a href="/subject/{{ s.code }}" class="sj {{ 'on' if nav_code==s.code }}" title="{{ s.name }}" style="--c:{{ s.color }}"><span class="dt"></span><span class="lb">{{ s.name }}</span></a>{% endfor %}
+   <div class="nsec">Track</div>
+   <a href="/analytics" class="{{ 'on' if nav_sec=='analytics' }}">{{ ic('chart') }}<span class="lb">Progress</span></a>
+   <a href="/history" class="{{ 'on' if nav_sec=='history' }}">{{ ic('clock') }}<span class="lb">History</span></a>
+   <div class="nsec">App</div>
+   <a href="/library" class="{{ 'on' if nav_sec=='library' }}">{{ ic('upload') }}<span class="lb">Import</span></a>
+   <a href="/settings" class="{{ 'on' if nav_sec=='settings' }}">{{ ic('cog') }}<span class="lb">Settings</span></a>
+  </nav>
+  <div class="sidefoot">
+   <div class="lvl small"><div class="row sp"><b>Lv {{ G.overall.level }} · {{ G.overall.title }}</b><span class="muted">{{ G.total }} cr</span></div>
+    <div class="bar sm"><i style="width:{{ G.overall.pct }}%"></i></div>
+    <div class="muted">{% if G.overall.max %}Max level{% else %}{{ G.overall.to_next }} cr to Lv {{ G.overall.level+1 }}{% endif %}</div></div>
+   <div class="tools">
+    <button data-ui="side" title="Collapse sidebar (Ctrl+B)">{{ ic('side') }}<span class="tx">Collapse</span></button>
+    <button data-ui="fullscreen" title="Full screen (F11)">{{ ic('full') }}<span class="tx">Full</span></button>
+    <button data-ui="exit" class="exit" title="Exit app (Ctrl+Q)">{{ ic('power') }}<span class="tx">Exit</span></button>
+   </div>
+  </div>
+ </aside>
+ <div class="main">
+  <div class="top">
+   {% if nav_parent %}<button class="backbtn" id="backBtn" data-parent="{{ nav_parent }}" title="Back (Alt+Left)">← Back</button>{% endif %}
+   <nav class="crumbs" aria-label="You are here">{% for lab, url in crumbs %}{% if not loop.first %}<i>›</i>{% endif %}{% if url %}<a href="{{ url }}">{{ lab }}</a>{% else %}<b aria-current="page">{{ lab }}</b>{% endif %}{% endfor %}</nav>
+   <div class="grow"></div>
+   <span class="chip fire" title="Day streak">{{ ic('flame') }}{{ streak }}</span>
+   <span class="chip" title="Today / daily goal">{{ ic('target') }}{{ today_n }}/{{ daily_goal }}</span>
+   <span class="chip bolt" title="Total credits">{{ ic('bolt') }}{{ G.total }}</span>
+   <button class="iconbtn" data-ui="search" title="Search (Ctrl+K)">{{ ic('search') }}</button>
+   <button class="iconbtn" data-ui="help" title="Keyboard shortcuts (?)">{{ ic('help') }}</button>
+   <button class="iconbtn" data-ui="fullscreen" title="Full screen (F11)">{{ ic('full') }}</button>
+  </div>
+  {% if nav_code %}{% set nsub = SUBJ|selectattr('code','equalto',nav_code)|first %}
+  <div class="subnav"><span class="who" style="--c:{{ nsub.color }}">{{ nsub.name }}</span>
+   <a href="/subject/{{ nav_code }}" class="{{ 'on' if nav_tab=='overview' }}">Overview</a>
+   <a href="/learn/{{ nav_code }}" class="{{ 'on' if nav_tab=='learn' }}">Learn</a>
+   <a href="/subject/{{ nav_code }}/practice" class="{{ 'on' if nav_tab=='practice' }}">Practice</a>
+   <a href="/subject/{{ nav_code }}/test" class="{{ 'on' if nav_tab=='tests' }}">Tests</a></div>{% endif %}
+  <div class="page">
+   {% if update %}<div class="flash ok row sp"><span>⬆ <b>GATE Prep {{ update.version }}</b> is available{% if update.notes %} — {{ update.notes }}{% endif %}</span>
+     <form method="post" action="/update/install"><button class="btn pri sm">Update &amp; restart</button></form></div>{% endif %}
+   {% with m = get_flashed_messages(with_categories=true) %}{% for c, t in m %}<div class="flash {{ c }}">{{ t }}</div>{% endfor %}{% endwith %}
+   {% block body %}{% endblock %}
+  </div>
+ </div>
+</div>
+<script>
+(function(){var b=document.getElementById('backBtn');if(!b)return;var go=function(){var r=document.referrer;if(history.length>1&&r&&r.indexOf(location.origin)===0&&r!==location.href)history.back();else location.href=b.dataset.parent;};b.onclick=go;document.addEventListener('keydown',function(e){if(e.altKey&&e.key==='ArrowLeft'){e.preventDefault();go();}});})();
+document.querySelectorAll('.tabs').forEach(tb=>{tb.querySelectorAll('button').forEach(b=>b.onclick=()=>{tb.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id===b.dataset.p));try{sessionStorage.setItem('tab:'+location.pathname,b.dataset.p)}catch(e){}})});
+try{const t=sessionStorage.getItem('tab:'+location.pathname);const b=t&&document.querySelector('.tabs button[data-p="'+t+'"]');if(b)b.click()}catch(e){}
+</script>
+{% block scripts %}{% endblock %}
+</body></html>

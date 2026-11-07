@@ -1,0 +1,21 @@
+# build output and local data
+dist/
+build/
+*.spec
+__pycache__/
+*.pyc
+data/
+data_check/
+*.log
+server.err
+# the web app's generated content is rebuilt by tools/export_site.py (GitHub Actions does it for Pages)
+web/data/
+# personal study material, earlier-version question banks and saved attempts are never published
+Studymaterials/
+Tests/
+Results/
+# past-paper questions stay on the owner's machine; the public site is built without them
+content/pyq_*.json
+# early design prototype
+trial/
+.claude/

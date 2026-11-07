@@ -1,0 +1,80 @@
+{% extends "base.html" %}{% import "_m.html" as m %}
+{% block title %}Result · GATE Prep{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/exam.css') }}">
+<style>.rv{margin-bottom:12px}.rv summary{list-style:none;cursor:pointer;display:flex;gap:12px;align-items:center;padding:14px 18px}.rv summary::-webkit-details-marker{display:none}
+.rv .body{padding:4px 22px 20px;border-top:1px solid var(--line)}.rv.correct{border-left:4px solid var(--ok)}.rv.wrong{border-left:4px solid var(--bad)}.rv.skipped{border-left:4px solid var(--mut2)}
+.rv .qtext{font-size:1rem;margin-top:14px}.rv .opts{margin-top:14px}.rv .opt{cursor:default;padding:10px 14px}.rv .opt:hover{transform:none;border-color:var(--line)}.rv .opt.right:hover{border-color:var(--ok)}.rv .opt.bad:hover{border-color:var(--bad)}
+.rv .ex{margin-top:14px;padding:14px 16px;border-radius:12px;background:var(--bg2);line-height:1.65;white-space:pre-wrap}
+.fbtn.on{border-color:var(--acc);background:var(--card2)}
+.bd{display:grid;grid-template-columns:150px 1fr 90px;gap:12px;align-items:center;padding:7px 0;font-size:.9rem}
+.stk{display:flex;height:10px;border-radius:9px;overflow:hidden;background:var(--bg2)}.stk i{display:block}</style>{% endblock %}
+{% block body %}
+{% set mx = a.max_marks %}{% set pctv = (a.score / mx * 100)|round|int if mx else 0 %}
+<div class="hero" style="margin-top:6px">
+ <div class="row wrap sp" style="gap:26px">
+  <div class="row" style="gap:24px">{{ m.ring([pctv,0]|max, pctv ~ '%', '#fff', 112) }}
+   <div><div style="opacity:.75;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700">{{ a.kind|replace('dpp','Practice')|replace('small','Small test')|replace('sfull','Full test')|replace('full','GATE mock')|replace('legacy','Earlier test') }}</div>
+    <h1 class="h1" style="font-size:2rem">{{ a.title }}</h1>
+    <div style="font-size:1.4rem;margin-top:4px"><b>{{ '%g'|format(a.score) }}</b> <span style="opacity:.7">/ {{ '%g'|format(mx) }} marks</span></div>
+    <div style="opacity:.8;margin-top:2px">{{ a.submitted_at[:16].replace('T', ' ') }}{% if a.used_sec %} · {{ a.used_sec|fmt_time }} used{% endif %}{% if a.violations %} · {{ a.violations }} violation(s){% endif %}</div></div></div>
+  <div class="row wrap" style="gap:12px">
+   <div class="stat"><b style="color:#a7f3d0">{{ a.correct }}</b><span>Correct</span></div>
+   <div class="stat"><b style="color:#fecdd3">{{ a.wrong }}</b><span>Wrong</span></div>
+   <div class="stat"><b>{{ a.skipped }}</b><span>Skipped</span></div>
+   <div class="stat" style="background:rgba(251,191,36,.22)"><b>+{{ a.credits }}</b><span>Credits earned</span></div>
+  </div></div>
+</div>
+
+<div class="row wrap" style="margin-top:16px;gap:10px">
+ <a class="btn pri" href="/">Dashboard</a>
+ {% if a.kind == 'dpp' %}<form method="post" action="/start/dpp"><input type="hidden" name="subject" value="{{ a.subject or '' }}"><input type="hidden" name="topic" value="{{ a.topic or '' }}"><input type="hidden" name="diff" value="{{ a.diff or '' }}"><input type="hidden" name="n" value="10"><button class="btn">One more DPP →</button></form>{% endif %}
+ {% if a.test_id %}<form method="post" action="/start/test/{{ a.test_id }}"><button class="btn">Retake</button></form><a class="btn" href="/">Subjects</a>{% endif %}
+</div>
+
+<div class="grid g2" style="margin-top:22px">
+ <div class="card flat"><h2 class="h2">By difficulty</h2>
+  {% for d in by_diff %}<div class="bd"><span class="tag {{ d.name }}" style="justify-self:start">{{ d.name }}</span>
+   <div class="stk"><i style="width:{{ d.c|pct(d.n) }}%;background:var(--ok)"></i><i style="width:{{ d.w|pct(d.n) }}%;background:var(--bad)"></i></div><span class="small muted">{{ d.c }}/{{ d.n }} correct</span></div>{% endfor %}
+  {% if by_subject|length > 1 %}<h2 class="h2" style="margin-top:20px">By subject</h2>
+  {% for d in by_subject %}<div class="bd"><b>{{ d.name }}</b><div class="stk"><i style="width:{{ d.c|pct(d.n) }}%;background:var(--ok)"></i><i style="width:{{ d.w|pct(d.n) }}%;background:var(--bad)"></i></div><span class="small muted">{{ d.c }}/{{ d.n }} · {{ '%g'|format(d.marks) }}m</span></div>{% endfor %}{% endif %}</div>
+ <div class="card flat"><h2 class="h2">Focus next on</h2><p class="small muted" style="margin:2px 0 8px">Weakest topics in this attempt</p>
+  {% for t in by_topic[:6] if t.c < t.n %}{% set sc, tp = t.name.split(' · ', 1) %}
+  <form method="post" action="/start/dpp" class="bd" style="grid-template-columns:1fr 70px 70px"><input type="hidden" name="subject" value="{{ sc }}"><input type="hidden" name="topic" value="{{ tp }}">
+   <span>{{ tp }} <span class="muted small">{{ sc }}</span></span><span class="small muted">{{ t.c }}/{{ t.n }}</span><button class="btn sm">Drill</button></form>
+  {% else %}<p class="muted">Flawless — nothing to fix here. 🎯</p>{% endfor %}</div>
+</div>
+
+<div class="sech"><div><h2 class="h2">Review answers</h2><p>Click a question to see the solution</p></div>
+ <div class="row" id="flt" style="gap:8px">{% for k,l in (('all','All'),('wrong','Wrong'),('skipped','Skipped'),('correct','Correct')) %}<button class="chip fbtn {{ 'on' if k=='all' }}" data-f="{{ k }}" style="cursor:pointer;font:inherit;color:var(--txt)">{{ l }}</button>{% endfor %}</div></div>
+{% for r in review %}
+<details class="card flat rv {{ r.state }}" data-s="{{ r.state }}" style="padding:0">
+ <summary><b style="min-width:34px">Q{{ r.pos }}</b>
+  <span class="tag" style="background:{{ 'rgba(52,211,153,.15)' if r.state=='correct' else ('rgba(251,113,133,.15)' if r.state=='wrong' else 'var(--card2)') }};color:{{ 'var(--ok)' if r.state=='correct' else ('var(--bad)' if r.state=='wrong' else 'var(--mut)') }}">{{ r.state }}</span>
+  <span class="grow muted small" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.subject }} · {{ r.topic }}</span><span class="tag {{ r.diff }}">{{ r.diff }}</span>
+  <b style="min-width:48px;text-align:right;color:{{ 'var(--ok)' if r.got>0 else ('var(--bad)' if r.got<0 else 'var(--mut)') }}">{{ '%+g'|format(r.got) }}</b></summary>
+ <div class="body"><div class="qtext">{{ r.text|rt }}</div>
+  {% if r.qtype == 'numerical' %}
+  <div class="row" style="margin-top:14px;gap:22px"><div>Your answer: <b>{{ r.numeric if r.numeric is not none else '—' }}</b></div><div>Correct: <b style="color:var(--ok)">{{ r.correct }}</b></div></div>
+  {% else %}<div class="opts">{% for o in r.options %}
+   <div class="opt {{ 'right' if o in r.answer else ('bad' if o in r.selected else '') }}"><span class="k">{{ 'ABCDEFGH'[loop.index0] }}</span><span>{{ o|rt }}</span>
+    {% if o in r.selected %}<span class="small muted" style="margin-left:auto">your pick</span>{% endif %}</div>{% endfor %}</div>{% endif %}
+  <div class="ex">{% if r.expl %}{{ r.expl|rt }}{% else %}<span class="muted">No written explanation for this question yet. Correct answer: {{ r.correct }}</span>{% endif %}</div>
+  <div class="row small muted" style="margin-top:10px;gap:16px"><span>Time: {{ r.time }}s</span><span>{{ '%g'|format(r.marks) }} mark{{ 's' if r.marks != 1 }}</span>{% if r.marked %}<span>⚑ marked</span>{% endif %}</div></div>
+</details>{% endfor %}
+
+<div class="modal {{ 'on' if new_events }}" id="lvModal"><div class="card box" style="position:relative;overflow:hidden">
+ {% for e in new_events %}<div class="lvp" {% if not loop.first %}hidden{% endif %}>
+  <div class="muted small" style="letter-spacing:.14em;text-transform:uppercase;font-weight:800">Level up!</div>
+  <div class="big-lv">{{ e.to }}</div>
+  <h2 class="h1" style="margin:6px 0">{{ 'Overall' if e.scope=='ALL' else e.scope }} · {{ e.title }}</h2>
+  {% if e.unlocked %}<div class="note" style="text-align:left;margin-top:14px"><b>Unlocked</b><br>{% for n in e.unlocked %}🔓 {{ n }}<br>{% endfor %}</div>{% else %}<p class="muted">Keep going — the next unlocks are close.</p>{% endif %}
+ </div>{% endfor %}
+ <button class="btn pri block" id="lvNext" style="margin-top:22px">{{ 'Next' if new_events|length > 1 else 'Awesome!' }}</button></div></div>
+{% endblock %}
+{% block scripts %}<script>
+$$=s=>[...document.querySelectorAll(s)];
+$$('#flt .fbtn').forEach(b=>b.onclick=()=>{$$('#flt .fbtn').forEach(x=>x.classList.toggle('on',x===b));$$('.rv').forEach(r=>r.hidden=!(b.dataset.f==='all'||r.dataset.s===b.dataset.f))});
+(function(){const ps=$$('.lvp');if(!ps.length)return;let i=0;const m=document.getElementById('lvModal'),b=document.getElementById('lvNext');
+ const sp=()=>{const box=m.querySelector('.box');for(let k=0;k<26;k++){const e=document.createElement('span');e.className='spark';e.textContent=['✨','⭐','🎉','⚡'][k%4];e.style.left='50%';e.style.top='40%';e.style.setProperty('--x',(Math.random()*440-220)+'px');e.style.setProperty('--y',(Math.random()*400-240)+'px');box.appendChild(e);setTimeout(()=>e.remove(),1500)}};
+ sp();b.onclick=()=>{i++;if(i>=ps.length){m.classList.remove('on');return}ps.forEach((p,j)=>p.hidden=j!==i);if(i===ps.length-1)b.textContent='Awesome!';sp()}})();
+</script>{% endblock %}
