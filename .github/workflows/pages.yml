@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install markupsafe
-      - name: Export questions, tests and lessons (public build: no past-paper questions)
+      - name: "Export questions, tests and lessons (public build, no past-paper questions)"
         run: python tools/export_site.py --public
       - name: Version the offline cache
         run: sed -i "s/gateprep-v1/gateprep-${GITHUB_SHA::7}/" web/sw.js
