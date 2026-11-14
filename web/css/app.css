@@ -294,3 +294,7 @@ table.t td{padding:8px;border-bottom:1px solid var(--line)}
 @media(max-width:900px){.only-d{display:none!important}}
 @media(min-width:901px){.only-m{display:none!important}}
 @media(max-width:900px){.crumbs .cr{display:none}.sec{padding-top:var(--s3)}.crumbs b{font-size:var(--t2)}}
+
+/* explanation notes: Concept / Method / Watch out */
+.fb p.note{margin:0 0 var(--s1)}
+.lab{display:block;font:700 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc);margin-bottom:1px}

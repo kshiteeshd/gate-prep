@@ -100,6 +100,16 @@ async function practiceRun(cfg, root) {
     delete S().running[cfg.key]; GP.save(); location.hash = '#/result/' + (S().tests.length - 1);
   }
   if (!review) { const el = $('#rtimer'); const t = () => { el.textContent = mmss((Date.now() - R.started) / 1000); }; t(); tick = setInterval(t, 1000); GP.cleanup = () => clearInterval(tick); }
+  const keyH = e => {
+    if ($('.sheetov') || e.ctrlKey || e.altKey || e.metaKey) return;
+    const typing = /INPUT|TEXTAREA/.test((e.target || {}).tagName);
+    if (e.key === 'Enter') { e.preventDefault(); const nx = $('#bnext'), ck = $('#bchk'); if (nx && !nx.hidden) next(); else if (ck && !ck.hidden && !ck.disabled) check(); return; }
+    if (typing || q().y === 'n' || A()) return;
+    const k = '12345678'.indexOf(e.key) >= 0 ? '12345678'.indexOf(e.key) : 'abcdefgh'.indexOf(e.key.toLowerCase());
+    const o = k >= 0 && $$('#rmain .opt')[k]; if (o) o.click();
+  };
+  document.addEventListener('keydown', keyH);
+  const prevClean = GP.cleanup; GP.cleanup = () => { prevClean && prevClean(); document.removeEventListener('keydown', keyH); };
   draw();
 }
 
@@ -160,7 +170,14 @@ F.test = async (p, root) => {
   function go(d) { stamp(); R.pos = Math.min(R.order.length - 1, Math.max(0, R.pos + d)); draw(); GP.save(); }
   function jump(pred) { stamp(); const all = []; secs.forEach(s => qs.forEach((q, i) => { if (t.sec[i] === s) all.push(i); })); const here = all.indexOf(R.order[R.pos]);
     for (let k = 1; k <= all.length; k++) { const j = all[(here + k) % all.length]; if (pred(qs[j])) { if (t.sec[j] !== R.sec) { R.sec = t.sec[j]; R.order = order(); $$('#rtabs button').forEach(b => b.classList.toggle('on', b.dataset.s === R.sec)); } R.pos = R.order.indexOf(j); draw(); GP.save(); return true; } } return false; }
-  const keys = e => { if (/INPUT|TEXTAREA/.test((e.target || {}).tagName) || $('.sheetov')) return; if (e.key === 'ArrowRight') go(1); else if (e.key === 'ArrowLeft') go(-1); };
+  const keys = e => {
+    if (/INPUT|TEXTAREA/.test((e.target || {}).tagName) || $('.sheetov') || e.ctrlKey || e.altKey || e.metaKey) return;
+    if (e.key === 'ArrowRight') go(1); else if (e.key === 'ArrowLeft') go(-1);
+    else {
+      const q = cur(), k = '12345678'.indexOf(e.key) >= 0 ? '12345678'.indexOf(e.key) : 'abcdefgh'.indexOf(e.key.toLowerCase());
+      if (q.y !== 'n' && k >= 0 && k < q.o.length) { const x = ans(q.i); x.sel = q.y === 'm' ? ((x.sel || []).includes(k) ? x.sel.filter(v => v !== k) : [...(x.sel || []), k]) : [k]; draw(); GP.save(); }
+    }
+  };
   function draw() {
     const q = cur(), a = R.ans[q.i] || {}, n = q.y === 'n', m = q.y === 'm'; if (!R.visited.includes(q.i)) R.visited.push(q.i);
     $('#rmain').innerHTML = `<div class="qpanel"><div class="qhead"><span>Question ${R.pos + 1} of ${R.order.length}${q.r && !R.dry ? ' · ' + esc(q.r) : ''}</span><span>${R.dry ? '' : `<span id="qt"></span> · ${esc(q.t)} · ${DIFF[q.d]} · `}${TYPE[q.y]} · ${mk(q)}</span></div>

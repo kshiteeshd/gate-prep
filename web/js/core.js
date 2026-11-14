@@ -23,7 +23,7 @@ function fx(text) {
   out.push(plain(text.slice(last)));
   return out.join('');
 }
-const para = t => fx(t).split(/\n{2,}/).map(p => /^<(pre|div)/.test(p.trim()) ? p : '<p>' + p.replace(/\n/g, '<br>') + '</p>').join('');
+const para = t => fx(t).split(/\n{2,}/).map(p => /^<(pre|div)/.test(p.trim()) ? p : '<p>' + p.replace(/\n/g, '<br>') + '</p>').join('').replace(/<p>(Concept|Method|Watch out):/g, '<p class="note"><span class="lab">$1</span>');
 function typeset(root) {
   if (!window.katex || !root) return;
   $$('.tex', root).forEach(e => { try { katex.render(e.dataset.tex, e, {throwOnError: false}); } catch (_) {} });

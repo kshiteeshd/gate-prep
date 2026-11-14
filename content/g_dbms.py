@@ -135,7 +135,7 @@ def sql_run(r):
     q, why, d = r.choice(QUERIES)
     v = c.execute(q).fetchone()[0]
     if v is None: v = 0
-    return nat(r, tbl("R", "abc", Rr) + "\n" + tbl("S", "bd", Sr) + "\n(NULL = missing value)\n```sql\n%s;\n```\nWhat is the (single) value returned?" % q, v, why)
+    return nat(r, tbl("R", "abc", Rr) + "\n" + tbl("S", "bd", Sr) + "\n(NULL = missing value)\n```sql\n%s;\n```\nWhat is the (single) value returned?" % q, v, why + " Evaluating the query on these rows gives %s." % v)
 
 
 @gen(S, SQL, "Query results", n=120, diff="hard", marks=2)
@@ -144,7 +144,7 @@ def sql_run_h(r):
     q, why, d = r.choice([x for x in QUERIES if x[2] != "easy"])
     v = c.execute(q).fetchone()[0]
     if v is None: v = 0
-    return nat(r, tbl("R", "abc", Rr) + "\n" + tbl("S", "bd", Sr) + "\n(NULL = missing value)\n```sql\n%s;\n```\nWhat is the value returned?" % q, v, why)
+    return nat(r, tbl("R", "abc", Rr) + "\n" + tbl("S", "bd", Sr) + "\n(NULL = missing value)\n```sql\n%s;\n```\nWhat is the value returned?" % q, v, why + " Evaluating the query on these rows gives %s." % v)
 
 
 @gen(S, SQL, "Aggregates", n=60, diff="easy")

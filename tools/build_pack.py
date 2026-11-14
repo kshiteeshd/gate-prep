@@ -10,6 +10,9 @@ import random
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if os.environ.get("PYTHONHASHSEED") != "0":      # string-set ordering must not change between builds, or question ids would drift
+    os.environ["PYTHONHASHSEED"] = "0"
+    sys.exit(__import__("subprocess").call([sys.executable] + sys.argv, env=os.environ))
 sys.path.insert(0, ROOT)
 from content import kit  # noqa: E402
 from gate import db, syllabus  # noqa: E402
@@ -73,6 +76,23 @@ def validate(q):
             assert 1 <= len(q["answer"]) < len(q["options"]), q
 
 
+def norm(t):
+    return " ".join((t or "").lower().split())
+
+
+def enrich(q):
+    """Append the concept note for the question's sub-topic (what the rule is, how to apply it, the usual trap)."""
+    from content import notes_a, notes_b, notes_c  # noqa: F401  (they register into notes_a.N)
+    note = notes_a.N.get((q["subject"], q["topic"], q["subtopic"])) or notes_a.N.get((q["subject"], None, q["subtopic"]))
+    if not note:
+        return False
+    idea, method, trap = note
+    parts = [(q.get("expl") or "").strip()] if (q.get("expl") or "").strip() else []
+    parts += ["Concept: " + idea, "Method: " + method, "Watch out: " + trap]
+    q["expl"] = "\n\n".join(parts)
+    return True
+
+
 def main():
     qs, seen_text = [], set()
     stats = collections.Counter()
@@ -104,7 +124,7 @@ def main():
             if key not in seen_text:
                 seen_text.add(key)
                 qs.append(q)
-    out, ids, bad = [], set(), 0
+    out, ids, bad, seen_dup, dup_dropped = [], set(), 0, set(), 0
     for q in qs:
         finish(q)
         try:
@@ -116,6 +136,11 @@ def main():
         if q["id"] in ids:
             continue
         ids.add(q["id"])
+        dk = (q["subject"], norm(q["text"]), tuple(sorted(q.get("options", []))))      # same question with options in another order
+        if dk in seen_dup:
+            dup_dropped += 1
+            continue
+        seen_dup.add(dk)
         out.append(q)
     # alternate pools inside each (subject, topic, diff, marks) bucket => DPP and Test never share a question
     bucket = collections.defaultdict(list)
@@ -125,6 +150,8 @@ def main():
         seeded("pool", *k).shuffle(items)
         for i, q in enumerate(items):
             q["pool"] = "test" if i % 2 == 0 else "dpp"
+    noted = sum(1 for q in out if enrich(q))
+    print("concept notes attached to %d of %d questions; duplicates dropped: %d" % (noted, len(out), dup_dropped))
     with open(os.path.join(ROOT, "content", "pack.json"), "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
     print("questions: %d (invalid dropped: %d) generators: %d" % (len(out), bad, len(kit.REG)))

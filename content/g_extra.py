@@ -78,12 +78,41 @@ CLS = [("Shortest path in a weighted graph (non-negative weights)", "P"), ("Mini
        ("3-colourability of a graph", "NPC"), ("Subset sum", "NPC"), ("Set cover (decision)", "NPC"), ("0/1 knapsack (decision)", "NPC"), ("Bin packing (decision)", "NPC"), ("Longest simple path (decision)", "NPC"),
        ("The halting problem", "UND"), ("Whether a program prints 'hello' on some input", "UND"), ("Post correspondence problem", "UND"), ("Equivalence of two Turing machines", "UND")]
 CNAME = {"P": "in P", "NPC": "NP-complete", "UND": "undecidable"}
+WHY = {
+    "Shortest path in a weighted graph (non-negative weights)": "Dijkstra's algorithm solves it in O((V + E) log V).",
+    "Minimum spanning tree": "Kruskal and Prim both run in polynomial time (O(E log V)).",
+    "2-SAT": "Each clause (a ∨ b) is two implications; satisfiability reduces to strongly connected components of the implication graph in linear time.",
+    "Bipartiteness testing": "A BFS/DFS 2-colouring decides it in O(V + E): the graph is bipartite iff it has no odd cycle.",
+    "Maximum bipartite matching": "Augmenting paths (Hopcroft–Karp) find it in polynomial time.",
+    "Maximum flow": "Ford–Fulkerson/Edmonds–Karp/Dinic solve it in polynomial time.",
+    "Primality testing": "The AKS algorithm decides primality in polynomial time in the number of bits.",
+    "Eulerian circuit existence": "A connected graph has an Euler circuit iff every vertex has even degree, which is checked in linear time.",
+    "Linear programming": "The ellipsoid and interior-point methods solve LPs in polynomial time (the simplex method is fast in practice).",
+    "2-colourability of a graph": "Same as bipartiteness: two-colour by BFS and look for a conflict.",
+    "Topological sorting": "DFS finishing order (or Kahn's algorithm) sorts a DAG in O(V + E).",
+    "3-SAT": "3-SAT is the classic NP-complete problem (Cook–Levin); it is in NP because a satisfying assignment is verified in polynomial time.",
+    "Vertex cover (decision)": "NP-complete: reduce from independent set/3-SAT; a proposed cover is checked in polynomial time.",
+    "Clique (decision)": "NP-complete (reduction from 3-SAT); a clique is easy to verify.",
+    "Independent set (decision)": "NP-complete; S is independent iff V − S is a vertex cover, so it is equivalent to vertex cover.",
+    "Hamiltonian cycle": "NP-complete (Karp's list); verifying a given cycle is polynomial.",
+    "Travelling salesman (decision)": "NP-complete: Hamiltonian cycle reduces to it by giving edges cost 1 and non-edges cost 2.",
+    "3-colourability of a graph": "NP-complete even though 2-colourability is in P.",
+    "Subset sum": "NP-complete; its dynamic program O(nS) is only pseudo-polynomial.",
+    "Set cover (decision)": "NP-complete (vertex cover is a special case).",
+    "0/1 knapsack (decision)": "NP-complete (weakly), solvable in pseudo-polynomial time by dynamic programming.",
+    "Bin packing (decision)": "NP-complete, via a reduction from partition.",
+    "Longest simple path (decision)": "NP-complete: Hamiltonian path asks for a simple path of length |V| − 1.",
+    "The halting problem": "Turing's diagonal argument shows no algorithm decides whether an arbitrary program halts.",
+    "Whether a program prints 'hello' on some input": "A non-trivial semantic property of programs, so Rice's theorem makes it undecidable.",
+    "Post correspondence problem": "Undecidable by reduction from the halting problem (it is semi-decidable).",
+    "Equivalence of two Turing machines": "A non-trivial property of the recognised language, undecidable by Rice's theorem.",
+}
 
 
 @gen(AL, CCT, "Classification", n=110, diff="easy")
 def np_class(r):
     p, c = r.choice(CLS)
-    return mcq(r, "The problem “%s” is" % p, CNAME[c], [v for k, v in CNAME.items() if k != c] + ["in co-NP but not in NP"], "Standard classification.")
+    return mcq(r, "The problem “%s” is" % p, CNAME[c], [v for k, v in CNAME.items() if k != c] + ["in co-NP but not in NP"], "%s — %s" % (CNAME[c].capitalize(), WHY[p]))
 
 
 @gen(AL, CCT, "Classification", n=110, diff="medium", marks=2)
@@ -91,7 +120,9 @@ def np_class_msq(r):
     want = r.choice(["P", "NPC"])
     yes = [p for p, c in CLS if c == want]
     no = [p for p, c in CLS if c != want]
-    return msq(r, "Which of the following problems are %s? (select all)" % CNAME[want], r.sample(yes, 2), r.sample(no, 2), "Standard classification.")
+    ys, ns = r.sample(yes, 2), r.sample(no, 2)
+    why = "Correct: " + " ".join("%s — %s" % (p, WHY[p]) for p in ys) + " Not %s: " % CNAME[want] + " ".join("%s is %s — %s" % (p, CNAME[dict(CLS)[p]], WHY[p]) for p in ns)
+    return msq(r, "Which of the following problems are %s? (select all)" % CNAME[want], ys, ns, why)
 
 
 @gen(AL, CCT, "Reductions", n=40, diff="medium")

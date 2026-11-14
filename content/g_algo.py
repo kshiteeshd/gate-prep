@@ -2,6 +2,7 @@
 import heapq
 import itertools
 import math
+import re
 from fractions import Fraction
 
 from content.kit import *
@@ -112,6 +113,14 @@ def a_loops_o(r):
 
 
 # ---------------- recurrences ----------------
+_SUPD = {"2": "²", "3": "³", "4": "⁴", "5": "⁵"}
+
+
+def _tidy(t):
+    t = re.sub(r"n\^1(?![\d.])", "n", t)
+    return re.sub(r"n\^([2-5])(?![\d.])", lambda m: "n" + _SUPD[m.group(1)], t)
+
+
 @gen(S, RC, "Master theorem", n=60, diff="medium")
 def a_master(r):
     a, b = r.choice([(1, 2), (2, 2), (3, 2), (4, 2), (8, 2), (9, 3), (2, 4), (4, 4), (7, 2), (1, 3), (3, 3), (16, 4)])
@@ -126,8 +135,10 @@ def a_master(r):
         res = "Θ(n^%d)" % k if k > 1 else ("Θ(n)" if k == 1 else "Θ(1)")
     rhs = {0: "1", 1: "n", 2: "n²", 3: "n³"}[k]
     ws = ["Θ(n^%s)" % fmt(round(L, 3)), "Θ(n log n)", "Θ(n²)", "Θ(n)", "Θ(log n)", "Θ(n² log n)", "Θ(n³)", "Θ(1)", "Θ(n^%d log n)" % max(k, 1), "Θ(n^%d)" % (k + 1)]
+    res, ws = _tidy(res), [_tidy(w) for w in ws]        # one notation for every option, so equal answers cannot appear twice
+    case = "equal ⇒ Θ(n^%d log n)" % k if abs(L - k) < 1e-9 else ("log_b a is larger ⇒ the leaves dominate: Θ(n^log_b a)" if L > k else "f(n) is larger ⇒ the root dominates: Θ(f(n))")
     return mcq(r, "Solve T(n) = %sT(n/%d) + %s (T(1) = 1) using the Master theorem:" % ("" if a == 1 else str(a), b, rhs), res, ws,
-               "log_%d %d = %s vs f(n) = Θ(n^%d)." % (b, a, fmt(round(L, 3)), k))
+               "Here a = %d, b = %d, so n^(log_b a) = n^(log_%d %d) = n^%s, while f(n) = Θ(n^%d). Comparing the two: %s." % (a, b, b, a, fmt(round(L, 3)), k, case))
 
 
 @gen(S, RC, "Recurrence evaluation", n=50, diff="easy")

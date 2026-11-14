@@ -15,30 +15,30 @@ def ly_cap(r):
     kind = r.choice(["nyq", "shan", "snr", "tx", "e2e", "bdp", "pipe", "levels", "overhead", "util"])
     B = r.choice([1, 2, 3, 4, 5, 10]) * 1000
     L = r.choice([2, 4, 8, 16, 32])
-    if kind == "nyq": return nat(r, "A noiseless channel has bandwidth %d Hz and the signal uses %d discrete levels. Maximum data rate (bps) by Nyquist?" % (B, L), int(2 * B * math.log2(L)), "C = 2B·log₂L.")
+    if kind == "nyq": return nat(r, "A noiseless channel has bandwidth %d Hz and the signal uses %d discrete levels. Maximum data rate (bps) by Nyquist?" % (B, L), int(2 * B * math.log2(L)), "Nyquist for a noiseless channel: C = 2B·log₂L = 2 × %d × log₂%d = %d bps." % (B, L, int(2 * B * math.log2(L))))
     if kind == "shan":
         snr = r.choice([3, 7, 15, 31, 63, 127, 255])
-        return nat(r, "A channel has bandwidth %d Hz and signal-to-noise ratio %d (a ratio, not dB). Shannon capacity in bps?" % (B, snr), int(B * math.log2(1 + snr)), "C = B·log₂(1 + S/N).")
+        return nat(r, "A channel has bandwidth %d Hz and signal-to-noise ratio %d (a ratio, not dB). Shannon capacity in bps?" % (B, snr), int(B * math.log2(1 + snr)), "Shannon: C = B·log₂(1 + S/N) = %d × log₂(1 + %d) = %d × %d = %d bps." % (B, snr, B, int(math.log2(1 + snr)), int(B * math.log2(1 + snr))))
     if kind == "snr":
         db = r.choice([10, 20, 30])
         return nat(r, "A telephone line with bandwidth %d Hz has SNR %d dB. Using Shannon's formula (take 10^(dB/10) exactly), capacity in bps, rounded to the nearest integer?" % (B, db), round(B * math.log2(1 + 10 ** (db / 10))), "SNR ratio = %d ⇒ C = B log₂(1 + SNR)." % 10 ** (db // 10), tol=1)
     if kind == "tx":
         pkt, rate = r.choice([1000, 1500, 4000, 12000]), r.choice([1, 10, 100]) * 10 ** 6
-        return nat(r, "A %d-bit packet is sent on a %d Mbps link. Transmission delay in microseconds?" % (pkt, rate // 10 ** 6), round(pkt / rate * 1e6, 2), "L/R.", tol=0.01)
+        return nat(r, "A %d-bit packet is sent on a %d Mbps link. Transmission delay in microseconds?" % (pkt, rate // 10 ** 6), round(pkt / rate * 1e6, 2), "Transmission delay = L/R = %d bits / %d bps = %s µs." % (pkt, rate, round(pkt / rate * 1e6, 2)), tol=0.01)
     if kind == "e2e":
         n, pkt, rate, d = r.randint(2, 5), r.choice([1000, 2000, 8000]), r.choice([1, 2, 10]) * 10 ** 6, r.choice([1, 2, 5])
         t = n * (pkt / rate * 1000) + n * d
-        return nat(r, "A single %d-bit packet crosses %d identical store-and-forward links, each of rate %d Mbps and propagation delay %d ms (ignore queuing and processing). End-to-end delay in ms? (up to 2 decimals)" % (pkt, n, rate // 10 ** 6, d), round(t, 2), "n·(L/R + d).", tol=0.01)
+        return nat(r, "A single %d-bit packet crosses %d identical store-and-forward links, each of rate %d Mbps and propagation delay %d ms (ignore queuing and processing). End-to-end delay in ms? (up to 2 decimals)" % (pkt, n, rate // 10 ** 6, d), round(t, 2), "Each store-and-forward link adds L/R + d. L/R = %d/%d s = %.3f ms, so %d × (%.3f + %d) = %.2f ms." % (pkt, rate, pkt / rate * 1000, n, pkt / rate * 1000, d, t), tol=0.01)
     if kind == "bdp":
         rate, rtt = r.choice([1, 10, 100, 1000]), r.choice([10, 20, 50, 100, 200])
-        return nat(r, "A link has bandwidth %d Mbps and round-trip time %d ms. Bandwidth-delay product in kilobits?" % (rate, rtt), rate * rtt, "Mbps × ms = kb.")
+        return nat(r, "A link has bandwidth %d Mbps and round-trip time %d ms. Bandwidth-delay product in kilobits?" % (rate, rtt), rate * rtt, "Bandwidth-delay product = bandwidth × RTT = %d Mbps × %d ms = %d kilobits in flight." % (rate, rtt, rate * rtt))
     if kind == "pipe":
         n, pk, pkt, rate = r.randint(2, 4), r.randint(3, 10), 1000, 10 ** 6
-        return nat(r, "%d packets of %d bits are sent back-to-back over %d store-and-forward links of rate 1 Mbps each (zero propagation delay). Time (ms) until the LAST packet is fully received at the destination?" % (pk, pkt, n), (n + pk - 1) * pkt / rate * 1000, "(links + packets − 1) × transmission time.")
+        return nat(r, "%d packets of %d bits are sent back-to-back over %d store-and-forward links of rate 1 Mbps each (zero propagation delay). Time (ms) until the LAST packet is fully received at the destination?" % (pk, pkt, n), (n + pk - 1) * pkt / rate * 1000, "Pipelining: the last packet arrives after (links + packets − 1) transmission times = (%d + %d − 1) × %.1f ms = %.1f ms." % (n, pk, pkt / rate * 1000, (n + pk - 1) * pkt / rate * 1000))
     if kind == "levels": return nat(r, "A signal with %d levels carries how many bits per signal element?" % (2 ** int(math.log2(L))), math.log2(L), "log₂ L.")
     if kind == "overhead":
         pay, hdr = r.choice([1000, 1460, 512]), r.choice([40, 58, 20])
-        return nat(r, "A packet carries %d bytes of payload with %d bytes of headers. Protocol efficiency in percent? (up to 2 decimals)" % (pay, hdr), round(pay / (pay + hdr) * 100, 2), "payload / total.", tol=0.01)
+        return nat(r, "A packet carries %d bytes of payload with %d bytes of headers. Protocol efficiency in percent? (up to 2 decimals)" % (pay, hdr), round(pay / (pay + hdr) * 100, 2), "Efficiency = payload / (payload + header) = %d / %d = %.2f%%." % (pay, pay + hdr, pay / (pay + hdr) * 100), tol=0.01)
     rate = r.choice([1, 2, 10]) * 10 ** 6
     return nat(r, "A source sends 1000-bit frames over a %d Mbps link with one-way propagation delay 5 ms using stop-and-wait (ack time negligible). Link utilisation in percent? (up to 2 decimals)" % (rate // 10 ** 6), round((1000 / rate) / (1000 / rate + 2 * 0.005) * 100, 2), "U = Tt / (Tt + 2·Tp).", tol=0.01)
 
@@ -98,20 +98,20 @@ def dl_win(r):
     kind = r.choice(["gbn", "sr", "seqbits", "opt", "util", "sw_eff", "gbn_re"])
     k = r.randint(2, 8)
     a = r.choice([1, 2, 4, 9, 19, 49])
-    if kind == "gbn": return nat(r, "Go-Back-N ARQ uses %d-bit sequence numbers. Maximum sender window size?" % k, 2 ** k - 1, "2^k − 1.")
-    if kind == "sr": return nat(r, "Selective Repeat ARQ uses %d-bit sequence numbers. Maximum sender window size?" % k, 2 ** (k - 1), "2^(k−1).")
+    if kind == "gbn": return nat(r, "Go-Back-N ARQ uses %d-bit sequence numbers. Maximum sender window size?" % k, 2 ** k - 1, "Go-Back-N needs the window to stay below the sequence space so old and new frames are not confused: W ≤ 2^k − 1 = 2^%d − 1 = %d." % (k, 2 ** k - 1))
+    if kind == "sr": return nat(r, "Selective Repeat ARQ uses %d-bit sequence numbers. Maximum sender window size?" % k, 2 ** (k - 1), "Selective Repeat needs sender and receiver windows that do not overlap in the sequence space: W ≤ 2^(k−1) = 2^%d = %d." % (k - 1, 2 ** (k - 1)))
     if kind == "seqbits":
         w = r.choice([7, 15, 31, 63, 127])
-        return nat(r, "Go-Back-N with a window of %d frames needs at least how many bits for the sequence number?" % w, math.ceil(math.log2(w + 1)), "Need 2^k ≥ W + 1.")
+        return nat(r, "Go-Back-N with a window of %d frames needs at least how many bits for the sequence number?" % w, math.ceil(math.log2(w + 1)), "Go-Back-N needs W ≤ 2^k − 1, i.e. 2^k ≥ W + 1 = %d, so k = ⌈log₂ %d⌉ = %d." % (w + 1, w + 1, math.ceil(math.log2(w + 1))))
     if kind == "opt":
         tt, tp = r.choice([1, 2, 5]), r.choice([5, 10, 20, 50])
-        return nat(r, "Frame transmission time is %d ms, one-way propagation delay %d ms (ack time negligible). Minimum window size (frames) to keep the sender busy continuously?" % (tt, tp), 1 + math.ceil(2 * tp / tt), "W = 1 + 2·Tp/Tt.")
+        return nat(r, "Frame transmission time is %d ms, one-way propagation delay %d ms (ack time negligible). Minimum window size (frames) to keep the sender busy continuously?" % (tt, tp), 1 + math.ceil(2 * tp / tt), "To keep the sender busy until the first ack returns: W = 1 + 2·Tp/Tt = 1 + 2 × %d / %d = %d frames." % (tp, tt, 1 + math.ceil(2 * tp / tt)))
     if kind == "util":
         w = r.choice([1, 2, 4, 8, 16, 32])
-        return nat(r, "A sliding-window protocol has window size %d and a ratio a = Tp/Tt = %d. Channel utilisation in percent? (up to 2 decimals; cap at 100)" % (w, a), round(min(1, w / (1 + 2 * a)) * 100, 2), "U = min(1, W/(1 + 2a)).", tol=0.01)
+        return nat(r, "A sliding-window protocol has window size %d and a ratio a = Tp/Tt = %d. Channel utilisation in percent? (up to 2 decimals; cap at 100)" % (w, a), round(min(1, w / (1 + 2 * a)) * 100, 2), "U = min(1, W/(1 + 2a)) = min(1, %d/(1 + 2 × %d)) = min(1, %d/%d) = %.2f%%." % (w, a, w, 1 + 2 * a, min(1, w / (1 + 2 * a)) * 100), tol=0.01)
     if kind == "sw_eff":
         tt, tp = r.choice([1, 2, 4]), r.choice([5, 10, 20])
-        return nat(r, "Stop-and-wait: Tt = %d ms, one-way Tp = %d ms. Efficiency in percent? (up to 2 decimals)" % (tt, tp), round(tt / (tt + 2 * tp) * 100, 2), "Tt / (Tt + 2Tp).", tol=0.01)
+        return nat(r, "Stop-and-wait: Tt = %d ms, one-way Tp = %d ms. Efficiency in percent? (up to 2 decimals)" % (tt, tp), round(tt / (tt + 2 * tp) * 100, 2), "Stop-and-wait sends one frame per round trip: η = Tt/(Tt + 2Tp) = %d/(%d + 2 × %d) = %d/%d = %.2f%%." % (tt, tt, tp, tt, tt + 2 * tp, tt / (tt + 2 * tp) * 100), tol=0.01)
     n = r.randint(8, 30)
     return nat(r, "In Go-Back-N with window size %d, frame number %d is lost while frames up to %d were already sent. How many frames are retransmitted in total (frame %d onward up to frame %d)?" % (r.choice([4, 7, 8]), n, n + 3, n, n + 3), 4, "Frames n … n+3 are all resent.")
 
@@ -171,26 +171,26 @@ def ip_sub(r):
     ip = ".".join(str(r.randint(1, 223)) for _ in range(4))
     net = ipaddress.ip_network("%s/%d" % (ip, prefix), strict=False)
     kind = r.choice(["hosts", "mask", "netaddr", "bcast", "nsub", "same", "lastoctet", "firsthost"])
-    if kind == "hosts": return nat(r, "How many usable host addresses are there in a /%d IPv4 subnet?" % prefix, 2 ** (32 - prefix) - 2, "2^(32−%d) − 2." % prefix)
+    if kind == "hosts": return nat(r, "How many usable host addresses are there in a /%d IPv4 subnet?" % prefix, 2 ** (32 - prefix) - 2, "A /%d leaves %d host bits, giving 2^%d = %d addresses; subtract the network and broadcast addresses: %d usable hosts." % (prefix, 32 - prefix, 32 - prefix, 2 ** (32 - prefix), 2 ** (32 - prefix) - 2))
     if kind == "mask":
         m = str(net.netmask)
         octets = [x for x in m.split(".")]
-        return mcq(r, "The dotted-decimal subnet mask for prefix length /%d is" % prefix, m, [str(ipaddress.ip_network("0.0.0.0/%d" % p).netmask) for p in (prefix - 1, prefix + 1, prefix + 2, prefix - 2) if 1 <= p <= 31], "First %d bits are 1." % prefix)
-    if kind == "netaddr": return mcq(r, "The network address of host %s/%d is" % (ip, prefix), str(net.network_address), [str(ipaddress.ip_address(int(net.network_address) + d)) for d in (1, 2 ** (32 - prefix) // 2 if prefix < 31 else 1, -(2 ** (32 - prefix)) if int(net.network_address) > 2 ** (32 - prefix) else 4)] + [ip], "AND the address with the mask.")
-    if kind == "bcast": return mcq(r, "The broadcast address of the subnet containing %s/%d is" % (ip, prefix), str(net.broadcast_address), [str(net.network_address), str(ipaddress.ip_address(int(net.broadcast_address) - 1)), str(ipaddress.ip_address(int(net.broadcast_address) + 1)), ip], "Set all host bits to 1.")
+        return mcq(r, "The dotted-decimal subnet mask for prefix length /%d is" % prefix, m, [str(ipaddress.ip_network("0.0.0.0/%d" % p).netmask) for p in (prefix - 1, prefix + 1, prefix + 2, prefix - 2) if 1 <= p <= 31], "A /%d mask has %d leading 1 bits and %d trailing 0 bits, which is %s in dotted decimal." % (prefix, prefix, 32 - prefix, m))
+    if kind == "netaddr": return mcq(r, "The network address of host %s/%d is" % (ip, prefix), str(net.network_address), [str(ipaddress.ip_address(int(net.network_address) + d)) for d in (1, 2 ** (32 - prefix) // 2 if prefix < 31 else 1, -(2 ** (32 - prefix)) if int(net.network_address) > 2 ** (32 - prefix) else 4)] + [ip], "Network address = host address AND mask: the first %d bits are kept and the %d host bits become 0, giving %s." % (prefix, 32 - prefix, net.network_address))
+    if kind == "bcast": return mcq(r, "The broadcast address of the subnet containing %s/%d is" % (ip, prefix), str(net.broadcast_address), [str(net.network_address), str(ipaddress.ip_address(int(net.broadcast_address) - 1)), str(ipaddress.ip_address(int(net.broadcast_address) + 1)), ip], "Broadcast address = network address with all %d host bits set to 1: %s (network %s)." % (32 - prefix, net.broadcast_address, net.network_address))
     if kind == "nsub":
         b = r.randint(1, 5)
         base = r.choice([16, 20, 24])
-        return nat(r, "A /%d network is split into equal subnets by borrowing %d additional bits. How many subnets (counting all subnets, including all-zeros/all-ones)?" % (base, b), 2 ** b, "2^b.")
+        return nat(r, "A /%d network is split into equal subnets by borrowing %d additional bits. How many subnets (counting all subnets, including all-zeros/all-ones)?" % (base, b), 2 ** b, "Borrowing %d bits from the host part creates 2^%d = %d subnets, each a /%d network." % (b, b, 2 ** b, base + b))
     if kind == "same":
         a = int(net.network_address) + r.randint(1, max(1, 2 ** (32 - prefix) - 2))
         other = a ^ (1 << r.randint(0, 31))
         same = ipaddress.ip_address(other) in net
-        return mcq(r, "Are hosts %s and %s in the same subnet when the mask is /%d?" % (ipaddress.ip_address(a), ipaddress.ip_address(other), prefix), "Yes" if ipaddress.ip_address(a) in net and same else "No", ["No" if same else "Yes", "Only if they have the same class", "Only through a router"], "Compare network prefixes.") if (ipaddress.ip_address(a) in net) else (_ for _ in ()).throw(Skip())
+        return mcq(r, "Are hosts %s and %s in the same subnet when the mask is /%d?" % (ipaddress.ip_address(a), ipaddress.ip_address(other), prefix), "Yes" if ipaddress.ip_address(a) in net and same else "No", ["No" if same else "Yes", "Only if they have the same class", "Only through a router"], "Two hosts are in the same subnet exactly when their first %d bits (the network prefix) are equal." % prefix) if (ipaddress.ip_address(a) in net) else (_ for _ in ()).throw(Skip())
     if kind == "lastoctet":
         host = int(net.broadcast_address) % 256
-        return nat(r, "The last octet of the broadcast address of %s/%d is" % (ip, prefix), host, "Broadcast = %s." % net.broadcast_address)
-    return mcq(r, "The first usable host address in the subnet of %s/%d is" % (ip, prefix), str(net.network_address + 1), [str(net.network_address), str(net.network_address + 2), str(net.broadcast_address), ip], "Network address + 1.")
+        return nat(r, "The last octet of the broadcast address of %s/%d is" % (ip, prefix), host, "Broadcast address = %s (all host bits 1), so its last octet is %d." % (net.broadcast_address, host))
+    return mcq(r, "The first usable host address in the subnet of %s/%d is" % (ip, prefix), str(net.network_address + 1), [str(net.network_address), str(net.network_address + 2), str(net.broadcast_address), ip], "The first usable host is the network address %s plus 1, because the network address itself is reserved." % net.network_address)
 
 
 @gen(S, IP, "CIDR & VLSM", n=100, diff="hard", marks=2)
