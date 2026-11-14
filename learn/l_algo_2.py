@@ -38,7 +38,7 @@ def _knap_brute(items, W):
 
 
 # ======================================================================================================
-lesson(subject=S, chapter="Dynamic Programming", ch_no=3, no=1, slug="algo-dynamic-programming", title="Dynamic Programming: LCS, Edit Distance, Knapsack & Matrix Chain",
+lesson(subject=S, chapter="Dynamic Programming", ch_no=3, no=1, slug="algo-dynamic-programming", title="Dynamic Programming at a glance (chapter overview)",
        topic="Dynamic Programming", minutes=26, weight=5, widget="dp",
        widget_hint="Choose LCS, edit distance or knapsack and change the inputs. The table is filled exactly as the recurrence says — the highlighted bottom-right cell is the answer.",
        key="Dynamic programming solves a problem by storing the answers to overlapping subproblems instead of recomputing them. Define the subproblem, write the recurrence, fill a table in dependency order — the table size is usually the running time.",
