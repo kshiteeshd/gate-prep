@@ -80,7 +80,7 @@ def main():
     for l in learn.LESSONS:
         full = {
             "slug": l["slug"], "subject": l["subject"], "ch_no": l["ch_no"], "chapter": l["chapter"], "no": l["no"], "title": l["title"],
-            "topic": l["topic"], "minutes": l["minutes"], "weight": l["weight"], "widget": l["widget"], "hint": l.get("widget_hint", ""),
+            "topic": l["topic"], "subs": l.get("subs", []), "minutes": l["minutes"], "weight": l["weight"], "widget": l["widget"], "hint": l.get("widget_hint", ""),
             "key": str(learn.mdi(l.get("key", ""))),
             "analogy": [l["analogy"][0], l["analogy"][1], str(learn.md(l["analogy"][2]))] if l.get("analogy") else None,
             "book": [[h, str(learn.md(b))] for h, b in l.get("book", [])],

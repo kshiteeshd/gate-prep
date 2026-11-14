@@ -62,10 +62,11 @@ async function ensureWidgets() { if (GP.widgetsReady) return; for (const n of WI
 function seeded(str) { let h = 2166136261; for (const c of str) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return () => { h = Math.imul(h ^ h >>> 15, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; }; }
 async function lessonPractice(l) {
   await GP.loadSubjects([l.subject]);
-  const pool = Object.values(GP.qi).filter(q => q.sub === l.subject && q.t === l.topic && q.p === 'dpp'), rng = seeded(l.slug);
+  const subs = l.subs || [], all = Object.values(GP.qi).filter(q => q.sub === l.subject && q.t === l.topic && q.p === 'dpp'), rng = seeded(l.slug);
+  const own = subs.length ? all.filter(q => subs.includes(q.s)) : [], pool = own.length >= 6 ? own : all, N = own.length >= 6 ? 8 : 5;
   const by = {e: [], m: [], h: []}; pool.forEach(q => by[q.d].push(q)); Object.values(by).forEach(a => a.sort(() => rng() - .5));
-  const pick = [...by.e.slice(0, 2), ...by.m.slice(0, 2), ...by.h.slice(0, 1)];
-  return pick.length < 5 ? [...pick, ...pool.filter(q => !pick.includes(q)).sort(() => rng() - .5)].slice(0, 5) : pick;
+  const pick = N === 8 ? [...by.e.slice(0, 3), ...by.m.slice(0, 3), ...by.h.slice(0, 2)] : [...by.e.slice(0, 2), ...by.m.slice(0, 2), ...by.h.slice(0, 1)];
+  return pick.length < N ? [...pick, ...pool.filter(q => !pick.includes(q)).sort(() => rng() - .5)].slice(0, N) : pick;
 }
 V.lesson = async p => {
   const l = await GP.json('data/lesson/' + p[2] + '.json');

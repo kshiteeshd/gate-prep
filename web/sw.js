@@ -1,5 +1,5 @@
 /* Offline reading: serve from cache at once, refresh in the background (stale-while-revalidate). */
-const CACHE = 'gateprep-v1';
+const CACHE = 'gateprep-v2';
 self.addEventListener('install', e => { self.skipWaiting(); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', e => {

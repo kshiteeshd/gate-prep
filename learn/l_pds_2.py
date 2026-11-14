@@ -93,7 +93,7 @@ O(n) time, **O(1)** extra space; every node's `next` is rewritten (n pointer cha
 
 
 # ======================================================================================================
-lesson(subject=S, chapter="Trees", ch_no=4, no=1, slug="pds-trees-bst-avl", title="Binary Trees, BST Operations & AVL Rotations",
+lesson(subject=S, chapter="Binary Trees, BST & AVL", ch_no=4, no=1, slug="pds-trees-bst-avl", title="Trees, BST and AVL at a glance (chapter overview)",
        topic="Trees & BST", minutes=26, weight=5, widget="bst",
        widget_hint="Insert keys in the given order and watch the shape. Tick AVL to see the tree rebalance and count rotations — try sorted input like 10 20 30 40 50 both ways.",
        key="A binary tree node has at most two children. In-order traversal of a binary search tree gives sorted keys; a BST is only fast (O(log n)) if it stays balanced — AVL trees guarantee it with rotations.",
@@ -161,7 +161,7 @@ Insertion needs **at most one rebalancing step** (a single or a double rotation)
 
 
 # ======================================================================================================
-lesson(subject=S, chapter="Trees", ch_no=4, no=2, slug="pds-heaps", title="Binary Heaps, Priority Queues & Heap Sort",
+lesson(subject=S, chapter="Heaps & Hashing", ch_no=5, no=1, slug="pds-heaps", title="Binary Heaps, Priority Queues & Heap Sort",
        topic="Heaps & Hashing", minutes=20, weight=4, widget="heap",
        widget_hint="Insert and extract values and watch the array and the tree stay in sync. Use ‘Build from list’ to see Floyd's bottom-up construction and its swap count.",
        key="A binary heap is a complete binary tree stored in an array where every parent is ≤ (min-heap) or ≥ (max-heap) its children. Insert and extract-root cost O(log n); building a heap from n items costs only O(n); heap sort is O(n log n) in place.",
@@ -233,7 +233,7 @@ def _chains(keys, m):
     return ch
 
 
-lesson(subject=S, chapter="Trees", ch_no=4, no=3, slug="pds-hashing", title="Hashing: Hash Functions, Chaining & Open Addressing",
+lesson(subject=S, chapter="Heaps & Hashing", ch_no=5, no=2, slug="pds-hashing", title="Hashing: Hash Functions, Chaining & Open Addressing",
        topic="Heaps & Hashing", minutes=20, weight=4, widget="hash",
        widget_hint="Enter keys and a table size, then switch between linear probing, quadratic probing, double hashing and chaining to compare collisions and the final layout.",
        key="A hash table maps a key to an array slot with a hash function, giving O(1) expected search, insert and delete. Collisions are resolved by chaining (a list per slot) or open addressing (probe for another slot); the load factor α = n/m controls performance.",
@@ -298,7 +298,7 @@ def _count_edges_matrix(m):
     return sum(map(sum, m)) // 2
 
 
-lesson(subject=S, chapter="Graphs", ch_no=5, no=1, slug="pds-graph-representation", title="Graph Representation: Adjacency Matrix, Adjacency List & Edge List",
+lesson(subject=S, chapter="Graphs", ch_no=6, no=1, slug="pds-graph-representation", title="Graph Representation: Adjacency Matrix, Adjacency List & Edge List",
        topic="Graph Representation", minutes=16, weight=3, widget="traverse",
        widget_hint="Enter the same graph and run BFS or DFS: the traversal result does not depend on representation — only the cost of finding neighbours does.",
        key="A graph can be stored as an adjacency matrix (O(V²) space, O(1) edge lookup) or adjacency lists (O(V + E) space, fast neighbour iteration). Choose the matrix for dense graphs, lists for sparse ones — and remember how this changes BFS/DFS cost.",
