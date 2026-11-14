@@ -63,6 +63,8 @@ def load_all():
         l["proofs"] = x.get("proofs", [])
         l["notes"] = x.get("notes", [])
         l["book"] = BOOK.get(l["slug"], [])
+    from learn.chapters import chapterize
+    chapterize(LESSONS)
     LESSONS.sort(key=lambda l: (l["subject"], l["ch_no"], l["no"]))
 
 

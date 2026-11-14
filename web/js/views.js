@@ -86,7 +86,7 @@ V.lesson = async p => {
   if (l.quick.length) html += sec('s-quick', 'Quick check', '<p class="mut">Instant questions to lock the idea in.</p>' + l.quick.map((q, i) => `<div class="check quick" data-i="${i}"><b>${q[0]}</b><div style="margin-top:var(--s1)">${q[1].map((o, k) => `<button class="opt" data-k="${k}"><span class="k">${LET[k]}</span><span>${esc(o)}</span></button>`).join('')}</div><div class="fbq"></div></div>`).join(''));
   html += sec('s-practice', 'GATE-level practice', prac.length ? prac.map((q, i) => `<div class="check" id="pq-${i}"></div>`).join('') : '<p class="mut">No practice questions for this topic yet.</p>');
   html += sec('s-sum', 'Summary — cheat sheet', `<ul>${l.summary.map(b => `<li>${b}</li>`).join('')}</ul>
-   <div class="fin"><div class="row sp wrap"><div><b>Finished this topic?</b><div class="mut sm">Mark it complete to earn 20 credits.</div></div><button class="btn pri" id="complete">${lessonDone(l.slug) ? '✓ Completed' : 'Mark as complete'}</button></div></div>`);
+   <div class="fin"><div class="row sp wrap"><div><b>Finished this topic?</b><div class="mut sm">Mark it complete to earn ${l.credits || 20} credits.</div></div><button class="btn pri" id="complete">${lessonDone(l.slug) ? '✓ Completed' : 'Mark as complete'}</button></div></div>`);
   const ls = GP.lessonsOf(l.subject), i = ls.findIndex(x => x.slug === l.slug), pv = ls[i - 1], nx = ls[i + 1];
   html += `<div class="pn">${pv ? `<a class="btn" href="#/lesson/${pv.slug}">← ${esc(pv.title)}</a>` : '<span></span>'}${nx ? `<a class="btn pri" href="#/lesson/${nx.slug}">Next: ${esc(nx.title)} →</a>` : ''}</div></article>
    <nav class="toc">${secs.map(s => `<a data-s="${s[0]}">${esc(s[1])}</a>`).join('')}</nav></div></div>`;
@@ -99,7 +99,7 @@ V.lesson = async p => {
       $$('.opt', card).forEach((x, k) => { x.disabled = true; if (k === q[2]) x.classList.add('right'); else if (x === b) x.classList.add('wrong'); });
       $('.fbq', card).innerHTML = `<div class="fb ${ok ? 'ok' : 'no'}"><p><b class="${ok ? 'ok' : 'no'}">${ok ? 'Correct' : 'Not quite'}</b></p><p>${esc(q[3])}</p></div>`; }); });
     prac.forEach((q, k) => GP.mountQ($('#pq-' + k, art), q, {src: 'lesson', label: `Question ${k + 1} of ${prac.length}`}));
-    $('#complete', v).onclick = e => { if (L.done) { toast('Already completed'); return; } L.done = today(); S().credits += 20; S().days[today()] = (S().days[today()] || 0) + 20; GP.save(); e.target.textContent = '✓ Completed'; toast('Lesson complete: +20 credits'); GP.chrome(); };
+    $('#complete', v).onclick = e => { if (L.done) { toast('Already completed'); return; } L.done = today(); const cr = l.credits || 20; S().credits += cr; S().days[today()] = (S().days[today()] || 0) + cr; GP.save(); e.target.textContent = '✓ Completed'; toast('Lesson complete: +' + cr + ' credits'); GP.chrome(); };
     typeset(art);
     if (l.widget !== 'none') { try { await ensureWidgets(); const el = $('.wgt', v), f = window.LW_W && window.LW_W[l.widget]; f ? f(el) : el.innerHTML = '<p class="mut">This tool is not available.</p>'; typeset(el); } catch (e) { console.error(e); } }
     const bar = $('#readbar'), tocs = $$('.toc a', v), secEls = secs.map(s => $('#' + s[0]));

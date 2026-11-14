@@ -26,7 +26,7 @@ slugs = set()
 
 
 def texts(l):
-    t = [l["key"], l["analogy"][2]] + [s["md"] for s in l["sections"]] + list(l["summary"])
+    t = [l["key"], (l.get("analogy") or ("", "", ""))[2]] + [s["md"] for s in l["sections"]] + list(l["summary"])
     for s in l["sections"]:
         t += [c[2] for c in s.get("call", [])]
     t += [x[1] for x in l["traps"]]
