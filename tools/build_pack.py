@@ -82,7 +82,8 @@ def norm(t):
 
 def enrich(q):
     """Append the concept note for the question's sub-topic (what the rule is, how to apply it, the usual trap)."""
-    from content import notes_a, notes_b, notes_c  # noqa: F401  (they register into notes_a.N)
+    from content import notes_a, notes_b, notes_c, trace  # noqa: F401  (they register into notes_a.N)
+    trace.add(q)
     note = notes_a.N.get((q["subject"], q["topic"], q["subtopic"])) or notes_a.N.get((q["subject"], None, q["subtopic"]))
     if not note:
         return False
