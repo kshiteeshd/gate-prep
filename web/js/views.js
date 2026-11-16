@@ -82,27 +82,39 @@ V.lesson = async p => {
   const l = await GP.json('data/lesson/' + p[2] + '.json');
   if (S().subject !== l.subject) { S().subject = l.subject; GP.save(); GP.chrome(); }
   const prac = await lessonPractice(l), secs = [], numbered = !!l.section, stest = (await GP.tests()).find(t => t.id === 'sub-' + l.slug);
-  const sec = (id, h, body) => { secs.push([id, h]); return `<section class="sec" id="${id}"><h2 class="h2">${esc(h)}</h2>${body}</section>`; };
-  let html = `<div class="read"><i id="readbar"></i></div><div class="page wide"><div class="lesson"><article><div class="eyebrow">${numbered ? esc(l.section) + ' · ' : ''}Chapter ${l.ch_no} · ${esc(l.chapter)} · ${l.minutes} min · GATE weight ${'★'.repeat(l.weight)}${'☆'.repeat(5 - l.weight)}</div>
-   <h1 class="h1" style="margin:var(--s1) 0 var(--s2)">${numbered ? `<span class="num">${l.ch_no}.${l.no}</span> ` : ''}${esc(l.title)}</h1><div class="tocm"><details><summary>Contents</summary><div id="tocm" class="stack" style="padding:var(--s1) 0"></div></details></div>`;
-  html += sec('s-idea', 'The idea in one line', `<div class="callout key"><span class="t">Key idea</span>${l.key}</div>` + (l.analogy ? `<div class="analogy"><span class="em">${l.analogy[0]}</span><div><b>${esc(l.analogy[1])}</b><div class="mut">${l.analogy[2]}</div></div></div>` : ''));
-  if (l.book.length) html += sec('s-book', 'Learn it from scratch', `<p class="mut">Read this part top to bottom like a textbook chapter. Nothing is assumed — new terms are explained where they first appear.</p><div class="book">${l.book.map(b => `<h3 class="bk">${esc(b[0])}</h3>${b[1]}`).join('')}</div>`);
-  l.sections.forEach((s, i) => { html += sec('s-' + (i + 1), s.h, s.html + s.formulas.map(f => `<div class="formula"><div class="texd" data-tex="${esc(f[0])}">${esc(f[0])}</div>${f[1] ? `<small>${esc(f[1])}</small>` : ''}</div>`).join('') + s.call.map(c => `<div class="callout ${c[0]}"><span class="t">${esc(c[1])}</span>${c[2]}</div>`).join('')); });
+  /* the lesson template: header · key idea · definitions · concepts · try it · worked examples · proofs · notes · mistakes · quick check · practice · summary */
+  const sec = (id, h, body, cls = '') => { secs.push([id, h]); return `<section class="sec ${cls}" id="${id}"><h2 class="lh2">${h}</h2>${body}</section>`; };
+  const box = (kind, label, body) => `<div class="cbox ${kind}"><span class="lbl">${esc(label)}</span>${body}</div>`;
+  const concepts = l.concepts || [...l.book.map(b => ({h: b[0], html: b[1], formulas: [], call: []})), ...l.sections];
+  const num = numbered ? `${l.ch_no}.${l.no}` : '';
+  let html = `<div class="read"><i id="readbar"></i></div><div class="page wide"><div class="lesson"><article class="lt">
+   <header class="lhead"><div class="crumb">${numbered ? `<span>${esc(l.section)}</span><span>Chapter ${l.ch_no} · ${esc(l.chapter)}</span>` : `<span>Chapter ${l.ch_no} · ${esc(l.chapter)}</span>`}</div>
+   <h1 class="lh1">${num ? `<span class="lnum">${num}</span>` : ''}${esc(l.title)}</h1>
+   <div class="lmeta"><span>${l.minutes} min read</span><span>GATE weight <b class="stars">${'★'.repeat(l.weight)}${'☆'.repeat(5 - l.weight)}</b></span>${l.examples.length ? `<span>${l.examples.length} worked examples</span>` : ''}${stest ? `<span>${stest.q.length}-question test</span>` : ''}</div>
+   <div class="tocm"><details><summary>Contents</summary><div id="tocm" class="stack" style="padding:var(--s1) 0"></div></details></div></header>`;
+  const goals = concepts.length > 1 ? `<div class="goals"><span class="lbl">In this ${numbered ? 'sub-chapter' : 'lesson'}</span><ol>${concepts.map(c => `<li>${esc(c.h)}</li>`).join('')}</ol></div>` : '';
+  html += sec('s-idea', 'Key idea', box('key', 'In one line', l.key) + (l.analogy ? `<div class="analogy"><span class="em">${l.analogy[0]}</span><div><b>${esc(l.analogy[1])}</b><div>${l.analogy[2]}</div></div></div>` : '') + goals);
+  if (l.defs && l.defs.length) html += sec('s-defs', 'Definitions', `<dl class="defs">${l.defs.map(d => `<div class="def"><dt>${esc(d[0])}</dt><dd>${d[1]}</dd></div>`).join('')}</dl>`);
+  concepts.forEach((c, i) => { html += sec('s-' + (i + 1), `<span class="cn">${i + 1}</span>${esc(c.h)}`, `<div class="prose">${c.html}</div>` +
+    (c.formulas || []).map(f => box('thm', f[1] || 'Formula', `<div class="texd" data-tex="${esc(f[0])}">${esc(f[0])}</div>`)).join('') +
+    (c.call || []).map(x => box({key: 'key', tip: 'tip', trap: 'trap', warn: 'trap', note: 'note'}[x[0]] || 'note', x[1], x[2])).join('')); });
   if (l.widget !== 'none') html += sec('s-try', 'Try it yourself', (l.hint ? `<p class="mut">${esc(l.hint)}</p>` : '') + `<div class="wgt" data-w="${l.widget}"></div>`);
-  if (l.examples.length) html += sec('s-ex', 'Worked examples', l.examples.map((e, i) => `<div style="margin:var(--s2) 0"><div class="eyebrow">Example ${i + 1}</div><b>${esc(e.title)}</b>${e.problem}<details><summary>Show the solution step by step</summary><ol class="steps">${e.steps.map(s => `<li><div>${s}</div></li>`).join('')}</ol><div class="callout tip"><span class="t">Answer</span>${e.answer}</div></details></div>`).join(''));
-  if (l.proofs.length) html += sec('s-proofs', 'Proofs and derivations', l.proofs.map(x => `<div class="deep"><h3>${esc(x[0])}</h3>${x[1]}</div>`).join(''));
-  if (l.notes.length) html += sec('s-notes', 'Detailed notes', l.notes.map(x => `<div class="deep"><h3>${esc(x[0])}</h3>${x[1]}</div>`).join(''));
-  if (l.traps.length) html += sec('s-traps', 'Common mistakes (GATE traps)', l.traps.map(t => `<div class="callout trap"><span class="t">${esc(t[0])}</span>${t[1]}</div>`).join(''));
-  if (l.quick.length) html += sec('s-quick', 'Quick check', '<p class="mut">Instant questions to lock the idea in.</p>' + l.quick.map((q, i) => `<div class="check quick" data-i="${i}"><b>${q[0]}</b><div style="margin-top:var(--s1)">${q[1].map((o, k) => `<button class="opt" data-k="${k}"><span class="k">${LET[k]}</span><span>${esc(o)}</span></button>`).join('')}</div><div class="fbq"></div></div>`).join(''));
+  if (l.examples.length) html += sec('s-ex', 'Worked examples', l.examples.map((e, i) => `<div class="cbox ex excard"><span class="lbl">Example ${num ? num + '.' : ''}${i + 1}</span><h3 class="lh3">${esc(e.title)}</h3><div class="prob">${e.problem}</div>
+     <details class="sol"><summary>Show the solution</summary><ol class="steps">${e.steps.map(x => `<li><div>${x}</div></li>`).join('')}</ol></details><div class="ans"><span>Answer</span>${e.answer}</div></div>`).join(''));
+  if (l.proofs.length) html += sec('s-proofs', 'Proofs and derivations', l.proofs.map(x => `<details class="cbox thm fold"><summary>${esc(x[0])}</summary><div class="prose">${x[1]}</div></details>`).join(''));
+  if (l.notes.length) html += sec('s-notes', 'Notes', l.notes.map(x => `<details class="cbox note fold"><summary>${esc(x[0])}</summary><div class="prose">${x[1]}</div></details>`).join(''));
+  if (l.traps.length) html += sec('s-traps', 'Common mistakes', l.traps.map(t => box('trap', t[0], t[1])).join(''));
+  if (l.quick.length) html += sec('s-quick', 'Quick check', '<p class="mut">Answer instantly; the explanation appears after you choose.</p>' + l.quick.map((q, i) => `<div class="check quick" data-i="${i}"><b>${q[0]}</b><div style="margin-top:var(--s1)">${q[1].map((o, k) => `<button class="opt" data-k="${k}"><span class="k">${LET[k]}</span><span>${esc(o)}</span></button>`).join('')}</div><div class="fbq"></div></div>`).join(''));
   html += sec('s-practice', 'GATE-level practice', prac.length ? prac.map((q, i) => `<div class="check" id="pq-${i}"></div>`).join('') : '<p class="mut">No practice questions for this topic yet.</p>');
-  html += sec('s-sum', 'Summary — cheat sheet', `<ul>${l.summary.map(b => `<li>${b}</li>`).join('')}</ul>
-   ${stest ? `<div class="fin" style="margin-bottom:var(--s2)"><div class="row sp wrap"><div><b>Sub-chapter test</b><div class="mut sm">${stest.q.length} GATE-style questions · ${stest.m} min · timed, with negative marking${S().done[stest.id] ? ' · best ' + S().done[stest.id].best + ' / ' + S().done[stest.id].max : ''}</div></div><a class="btn" href="#/test/${stest.id}">${S().done[stest.id] ? 'Retake test' : 'Take the test'}</a></div></div>` : ''}<div class="fin"><div class="row sp wrap"><div><b>Finished this ${numbered ? 'sub-chapter' : 'topic'}?</b><div class="mut sm">Mark it complete to earn ${l.credits || 20} credits.</div></div><button class="btn pri" id="complete">${lessonDone(l.slug) ? '✓ Completed' : 'Mark as complete'}</button></div></div>`);
+  html += sec('s-sum', 'Summary', `<div class="cbox key sumbox"><span class="lbl">Cheat sheet</span><ul class="ticks">${l.summary.map(b => `<li>${b}</li>`).join('')}</ul></div>
+   ${stest ? `<div class="fin"><div class="row sp wrap"><div><b>Sub-chapter test</b><div class="mut sm">${stest.q.length} GATE-style questions · ${stest.m} min · timed, with negative marking${S().done[stest.id] ? ' · best ' + S().done[stest.id].best + ' / ' + S().done[stest.id].max : ''}</div></div><a class="btn" href="#/test/${stest.id}">${S().done[stest.id] ? 'Retake test' : 'Take the test'}</a></div></div>` : ''}
+   <div class="fin"><div class="row sp wrap"><div><b>Finished this ${numbered ? 'sub-chapter' : 'lesson'}?</b><div class="mut sm">Mark it complete to earn ${l.credits || 20} credits.</div></div><button class="btn pri" id="complete">${lessonDone(l.slug) ? '✓ Completed' : 'Mark as complete'}</button></div></div>`);
   const ls = GP.lessonsOf(l.subject), i = ls.findIndex(x => x.slug === l.slug), pv = ls[i - 1], nx = ls[i + 1];
   html += `<div class="pn">${pv ? `<a class="btn" href="#/lesson/${pv.slug}">← ${esc(pv.title)}</a>` : '<span></span>'}${nx ? `<a class="btn pri" href="#/lesson/${nx.slug}">Next: ${esc(nx.title)} →</a>` : ''}</div></article>
-   <nav class="toc">${secs.map(s => `<a data-s="${s[0]}">${esc(s[1])}</a>`).join('')}</nav></div></div>`;
+   <nav class="toc">${secs.map(s => `<a data-s="${s[0]}">${s[1].replace(/<span class="cn">(\d+)<\/span>/, '$1. ')}</a>`).join('')}</nav></div></div>`;
   GP.after = async v => {
     const L = S().lessons[l.slug] || (S().lessons[l.slug] = {}), art = $('article', v);
-    $('#tocm', v).innerHTML = secs.map(s => `<a class="link" data-s="${s[0]}">${esc(s[1])}</a>`).join('');
+    $('#tocm', v).innerHTML = secs.map(s => `<a class="link" data-s="${s[0]}">${s[1].replace(/<span class="cn">(\d+)<\/span>/, '$1. ')}</a>`).join('');
     $$('[data-s]', v).forEach(a => a.onclick = () => { $('#' + a.dataset.s).scrollIntoView({behavior: 'smooth'}); const d = $('.tocm details', v); d && (d.open = false); });
     $$('.quick', art).forEach(card => { const q = l.quick[+card.dataset.i]; $$('.opt', card).forEach(b => b.onclick = () => {
       if (card.dataset.done) return; card.dataset.done = 1; const ok = +b.dataset.k === q[2];

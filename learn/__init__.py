@@ -121,7 +121,16 @@ def md(text):
 
     def flush_p():
         if para:
-            out.append("<p>%s</p>" % _inline(" ".join(para)))
+            text = " ".join(para)
+            runin = list(re.finditer(r"\*\*[^*]{2,48}?[:.]\*\*", text))
+            if len(runin) >= 2:                 # several bold run-in points in one paragraph -> a neat bullet list
+                head = text[:runin[0].start()].strip()
+                if head:
+                    out.append("<p>%s</p>" % _inline(head))
+                cuts = [m.start() for m in runin] + [len(text)]
+                out.append('<ul class="runin">%s</ul>' % "".join("<li>%s</li>" % _inline(text[a:b].strip()) for a, b in zip(cuts, cuts[1:])))
+            else:
+                out.append("<p>%s</p>" % _inline(text))
             del para[:]
 
     def flush_l():

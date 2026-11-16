@@ -66,8 +66,51 @@ def matches(v, answer):
     return norm(v) in norm(answer)
 
 
+def template_rules(l):
+    """docs/CONTENT_RULES.md: hard rules for sub-chapters of subjects organised into sections."""
+    wc = lambda t: len(re.sub(r"[#*`|$]", " ", str(t)).split())
+    if not l.get("defs"):
+        E(l, "RULE no definitions")
+    for t, d in l.get("defs", []):
+        if wc(d) > 45:
+            E(l, "RULE definition of %r longer than 45 words" % t)
+    if wc(l["key"]) > 70:
+        E(l, "RULE key idea longer than 70 words")
+    heads = [h for h, _ in l.get("book", [])] + [x["h"] for x in l["sections"]]
+    if len(heads) < 2:
+        E(l, "RULE fewer than 2 concept blocks")
+    for group in ([h for h, _ in l.get("book", [])], [x["h"] for x in l["sections"]]):   # a section repeating a book heading is folded in at export
+        if len(set(group)) != len(group):
+            E(l, "RULE repeated concept heading")
+    for t in [b for _, b in l.get("book", [])] + [x["md"] for x in l["sections"]]:
+        for para in re.split(r"\n\s*\n", t):
+            if not para.lstrip().startswith(("|", "-", "    ", "1.", "$$")) and wc(para) > 110 and len(re.findall(r"\*\*[^*]{2,48}?[:.]\*\*", para)) < 2:
+                E(l, "RULE paragraph of %d words (max 110): %s" % (wc(para), para.strip()[:50]))
+    if len(l["examples"]) < 3:
+        E(l, "RULE fewer than 3 worked examples")
+    titles = [e.title for e in l["examples"]]
+    if len(set(titles)) != len(titles):
+        E(l, "RULE repeated example title")
+    for e in l["examples"]:
+        if len(e.steps) < 2 and len(e.steps[0] if e.steps else "") < 40:
+            pass
+        if not e.verify and re.search(r"\d", re.sub(r"[A-Za-z]\w*\d+|\d+[A-Za-z]", "", e.answer)):
+            E(l, "RULE example %r has a numeric answer but no verify()" % e.title)
+    if len(l["quick"]) < 3:
+        E(l, "RULE fewer than 3 quick checks")
+    if len(l["traps"]) < 3:
+        E(l, "RULE fewer than 3 common mistakes")
+    if not 4 <= len(l["summary"]) <= 7:
+        E(l, "RULE summary has %d bullets (4-7)" % len(l["summary"]))
+    for b in l["summary"]:
+        if wc(b) > 30:
+            E(l, "RULE summary bullet longer than 30 words: %s" % b[:40])
+
+
 n_ex = n_ver = 0
 for l in learn.LESSONS:
+    if l.get("section") and (not only or l["subject"] == only):
+        template_rules(l)
     if only and l["subject"] != only:
         continue
     for k in REQ:

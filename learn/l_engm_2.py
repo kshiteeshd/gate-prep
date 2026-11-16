@@ -321,7 +321,7 @@ lesson(subject=S, chapter="Graph Theory", ch_no=5, no=2, slug="engm-graph-trees-
               "**18**", verify=lambda: str(_cycle_colourings(4, 3))),
            Ex("Why K₃,₃ is not planar", "Use an edge bound to show K₃,₃ is not planar.",
               ["K₃,₃ has V = 6, E = 9 and contains no triangle (it is bipartite).", "For a triangle-free planar graph E ≤ 2V − 4 = 8.", "9 > 8, so K₃,₃ **cannot** be planar."],
-              "9 edges exceed the bound 2V − 4 = 8, so K₃,₃ is non-planar."),
+              "9 edges exceed the bound 2V − 4 = 8, so K₃,₃ is non-planar.", verify=lambda: "%d edges exceed the bound 2V − 4 = %d" % (3 * 3, 2 * 6 - 4)),
        ],
        traps=[("Using E ≤ 3V − 6 as a planarity test", "It is only a necessary condition. K₃,₃ satisfies 9 ≤ 12 yet is non-planar — use the triangle-free bound 2V − 4 or Kuratowski."),
               ("Forgetting the outer face", "Euler's formula counts the unbounded face too."),

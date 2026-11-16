@@ -302,7 +302,7 @@ The coefficient of xⁿ in the Maclaurin series is f⁽ⁿ⁾(0)/n!. Series make
               "**4/3**", verify=lambda: str(F(2 ** 3, math.factorial(3)))),
            Ex("Differentiability test", "Is f(x) = |x − 1| differentiable at x = 1?",
               ["For x > 1, f(x) = x − 1 ⇒ slope +1. For x < 1, f(x) = 1 − x ⇒ slope −1.", "Left derivative ≠ right derivative ⇒ not differentiable (although continuous)."],
-              "**No** — continuous but with a corner at x = 1."),
+              "**No** — continuous but with a corner at x = 1.", verify=lambda: "No" if (1 - 0) != (0 - 1) else "Yes"),
        ],
        traps=[("Differentiable ⇒ continuous, not the reverse", "|x| is continuous but not differentiable at 0."),
               ("Quotient rule sign", "(f/g)′ = (f′g − fg′)/g² — numerator order matters."),

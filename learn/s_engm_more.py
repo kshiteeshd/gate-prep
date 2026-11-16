@@ -141,3 +141,59 @@ s.more("engm-posets-lattices", traps=[("Hasse diagram direction", "Smaller eleme
 s.more("engm-counting-basics", traps=[("Order matters?", "Decide before choosing P or C.")])
 s.more("engm-la-inverse", traps=[("Singular matrices", "No inverse when det = 0, even if no row is zero.")])
 s.more("engm-differentiation-mvt", quick=[("d/dx tan⁻¹ x", ["1/(1 + x²)", "1/√(1 − x²)", "sec² x", "−1/(1 + x²)"], 0, "Standard."), ("d/dx xˣ", ["x·xˣ⁻¹", "xˣ ln x", "xˣ(1 + ln x)", "ln x"], 2, "Logarithmic differentiation.")])
+
+# ---------------- audit (2026-11-16): one explanation per idea, every piece under the sub-topic it belongs to
+LGP, LGQ, LGF, LGO = "engm-logic-propositions", "engm-logic-quantifiers", "engm-lg-forms", "engm-lg-fol"
+s.more("engm-lg-equiv", drop=[(LGF, "S1")])
+s.more("engm-logic-quantifiers", drop=[(LGO, "S1")])
+s.more("engm-lg-fol", drop=[(LGQ, "S2")])
+s.more("engm-sets-counting", drop=[("engm-sets-counting", "B2")])
+s.more("engm-cb-arrange", take=[("engm-sets-counting", "B2")])
+s.more("engm-po-lattice-props", drop=[("engm-po-lattice-props", "S0")])
+s.more("engm-groups", drop=[("engm-groups", "S0")])
+s.more("engm-gp-cyclic", drop=[("engm-groups", "S3"), ("engm-gp-cyclic", "E3")])
+s.more("engm-gr-euler", drop=[("engm-gr-colour", "S1")])
+s.more("engm-gr-colour", drop=[("engm-gr-colour", "S0")])
+s.more("engm-cb-methods", drop=[("engm-counting-basics", "S2")])
+s.more("engm-matrices-determinants", drop=[("engm-matrices-determinants", "S0")])
+s.more("engm-la-determinants", drop=[("engm-matrices-determinants", "S1")])
+s.more("engm-la-inverse", drop=[("engm-matrices-determinants", "S2 E3")])
+s.more("engm-la-rank", drop=[("engm-matrices-determinants", "S3")])
+s.more("engm-la-systems", drop=[("engm-linear-systems-eigen", "S0")])
+s.more("engm-la-eigen-compute", drop=[("engm-linear-systems-eigen", "S1"), ("engm-la-eigen-compute", "E0")])
+s.more("engm-la-eigen-functions", drop=[("engm-linear-systems-eigen", "S2")])
+s.more("engm-la-cayley", drop=[("engm-la-eigen-compute", "S2"), ("engm-la-problem-set", "S0 S1 E5")])
+s.more("engm-limits-continuity", drop=[("engm-limits-continuity", "S1"), ("engm-ca-limits-technique", "E0")], take=[("engm-limits-continuity", "P0")])
+s.more("engm-ca-continuity", drop=[("engm-limits-continuity", "P0")])
+s.more("engm-ca-taylor", drop=[("engm-ca-derivatives", "S0 S1")])
+s.more("engm-ca-maxmin", drop=[("engm-ca-optimise-integrate", "S0")])
+s.more("engm-maxima-minima-integration", drop=[("engm-ca-optimise-integrate", "S1")])
+s.more("engm-pb-bayes", drop=[("engm-pb-bayes", "S0")])
+s.more("engm-pb-distributions", drop=[("engm-random-variables-distributions", "S2")])
+s.more("engm-probability-bayes", drop=[("engm-pb-problems", "E3")])
+s.more("engm-gr-planar", drop=[("engm-gr-problems", "E3")])
+s.more("engm-la-systems", drop=[("engm-la-problem-set", "E5")])
+s.more("engm-maxima-minima-integration", drop=[("engm-ca-optimise-integrate", "E4")])
+s.more("engm-gp-cyclic", sections=[dict(h="Subgroups and elements of a cyclic group", md="""Let G = ⟨g⟩ have order n. Then:
+
+- every subgroup of G is cyclic, and for each divisor d of n there is **exactly one** subgroup of order d, namely ⟨g^(n/d)⟩;
+- gᵏ has order n/gcd(k, n), so gᵏ generates G exactly when gcd(k, n) = 1, giving φ(n) generators;
+- the number of elements of order d is φ(d), and summing over the divisors gives Σ φ(d) = n.
+
+Example: in Z₁₂ the subgroups have orders 1, 2, 3, 4, 6, 12, and the elements of order 6 are 2 and 10 (φ(6) = 2).""")])
+# repeated checks and mistake cards (one of each pair kept)
+s.more("engm-functions", drop=[("engm-functions", "Q2")])
+s.more("engm-st-functions-count", drop=[("engm-functions", "Q0")])
+s.more("engm-gp-structure", drop=[("engm-gp-cyclic", "T0")])
+s.more("engm-gp-perm", drop=[("engm-gp-cyclic", "T1")])
+s.more("engm-ca-mvt", drop=[("engm-ca-derivatives", "T0 Q1")])
+s.more("engm-ca-taylor", drop=[("engm-ca-limits-technique", "T3")])
+s.more("engm-probability-bayes", drop=[("engm-pb-problems", "Q0")])
+s.more("engm-gr-trees", drop=[("engm-gr-counting", "Q1 T3")])
+s.more("engm-limits-continuity", drop=[("engm-ca-limits-technique", "Q0")])
+s.more("engm-functions", quick=[("f: ℝ → ℝ, f(x) = 3x − 2 is", ["one-to-one only", "onto only", "bijective", "neither"], 2, "Linear with non-zero slope."),
+                                ("A function from {1, 2, 3} to {a, b} can be", ["one-to-one", "onto", "bijective", "none of these"], 1, "3 inputs, 2 outputs: onto is possible, one-to-one is not.")])
+s.more("engm-gr-trees", quick=[("Number of labelled trees on 4 vertices", ["4", "12", "16", "64"], 2, "4² by Cayley."), ("Every tree with n ≥ 2 vertices has at least", ["1 leaf", "2 leaves", "n/2 leaves", "no leaves"], 1, "The ends of a longest path.")],
+       traps=[("Adding an edge", "One extra edge always creates exactly one cycle."), ("Forest edge count", "A forest with c trees has n − c edges, not n − 1.")])
+s.more("engm-ca-mvt", quick=[("Rolle's theorem applies to |x| on [−1, 1]?", ["yes", "no", "only at 0", "only for c = 0"], 1, "Not differentiable at 0.")])
+s.more("engm-ca-taylor", traps=[("Ratio test limit 1", "L = 1 decides nothing; use another test."), ("Expanding about the wrong point", "Taylor about a uses powers of (x − a).")])

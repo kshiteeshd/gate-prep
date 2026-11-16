@@ -314,3 +314,61 @@ table.t td{padding:8px;border-bottom:1px solid var(--line)}
 .tch>summary>span:last-child{flex:none;text-align:right;max-width:40%}
 .tch>summary>span:last-child::after{content:" ▾";color:var(--mut)}
 .tch[open]>summary>span:last-child::after{content:" ▴"}
+/* ---------- lesson template v2 ---------- */
+/* Type scale (lessons): title 30 · section 22 · block 18 · body 17 · small 14 · label 12. Colour code: blue = definition,
+   violet = theorem/formula/proof, green = worked example, red = common mistake, amber = tip, grey = note, accent = key idea. */
+:root{--c-def:#2563eb;--c-thm:#7c3aed;--c-ex:#15803d;--c-trap:#c2261d;--c-tip:#b45309;--c-note:#64748b;
+  --fs-title:clamp(26px,22px + 1.1vw,30px);--fs-h2:22px;--fs-h3:18px;--fs-body:17px;--fs-small:14px;--fs-label:12px}
+html[data-theme=slate],html[data-theme=midnight]{--c-def:#7aa2ff;--c-thm:#b69cff;--c-ex:#4cc38a;--c-trap:#f0706b;--c-tip:#e0a63a;--c-note:#9aa7bb}
+.lt{font-size:var(--fs-body);line-height:1.7}
+.lhead{padding-bottom:var(--s3);border-bottom:1px solid var(--line)}
+.lhead .crumb{display:flex;flex-wrap:wrap;gap:4px 14px;font:600 var(--fs-label)/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.lhead .crumb span+span::before{content:"›";margin-right:14px;color:var(--line2)}
+.lh1{font:700 var(--fs-title)/1.2 var(--sans);letter-spacing:-.015em;margin:10px 0 12px;overflow-wrap:anywhere}
+.lnum{display:inline-block;font:700 .8em var(--mono);color:var(--acc);background:var(--accbg);border-radius:6px;padding:1px 8px;margin-right:10px;vertical-align:.08em}
+.lmeta{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:var(--fs-small);color:var(--mut)}
+.lmeta .stars{color:var(--warn);font-weight:400;letter-spacing:1px}
+.lt .sec{padding-top:44px}
+.lh2{font:700 var(--fs-h2)/1.3 var(--sans);letter-spacing:-.01em;margin:0 0 14px;display:flex;align-items:baseline;gap:10px}
+.lh2 .cn{flex:none;font:700 14px/26px var(--mono);min-width:26px;height:26px;text-align:center;border-radius:50%;background:var(--accbg);color:var(--acc)}
+.lh3{font:700 var(--fs-h3)/1.35 var(--sans);margin:4px 0 8px}
+.lt .prose p,.lt .sec>p{margin:0 0 14px;max-width:72ch}
+.lt .prose ul,.lt .prose ol{margin:0 0 14px;padding-left:24px;max-width:72ch}
+.lt .prose li{margin:6px 0}.lt .prose li::marker{color:var(--acc)}
+.lt .prose b{font-weight:650}
+.lt .rt{font-size:var(--fs-small);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.lt .rt th{background:color-mix(in srgb,var(--acc) 8%,var(--bg));color:var(--ink);font:650 var(--fs-small) var(--sans);border-bottom:1px solid var(--line2)}
+.lt .rt tr:nth-child(even) td{background:color-mix(in srgb,var(--ink) 3%,transparent)}
+.lt pre{border-radius:6px;border-left-color:var(--c-thm);font-size:var(--fs-small)}
+.cbox{--c:var(--c-note);border:1px solid color-mix(in srgb,var(--c) 28%,var(--line));border-left:4px solid var(--c);background:color-mix(in srgb,var(--c) 6%,var(--bg));border-radius:8px;padding:12px 16px;margin:14px 0}
+.cbox>.lbl,.goals>.lbl{display:block;font:700 var(--fs-label)/1.4 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--c);margin-bottom:4px}
+.cbox p{margin:0 0 8px}.cbox p:last-child{margin-bottom:0}
+.cbox.key{--c:var(--acc)}.cbox.def{--c:var(--c-def)}.cbox.thm{--c:var(--c-thm)}.cbox.ex{--c:var(--c-ex)}.cbox.trap{--c:var(--c-trap)}.cbox.tip{--c:var(--c-tip)}.cbox.note{--c:var(--c-note)}
+.cbox.thm .texd{margin:6px 0;text-align:center}
+.goals{--c:var(--mut);margin-top:18px}.goals ol{margin:4px 0 0;padding-left:22px;color:var(--mut)}.goals li{margin:2px 0}
+.analogy{font-style:normal;color:var(--mut);background:var(--bg2);border-radius:8px;padding:12px 16px}.analogy b{color:var(--ink)}
+.defs{display:grid;gap:10px;margin:0}
+.def{border:1px solid color-mix(in srgb,var(--c-def) 28%,var(--line));border-left:4px solid var(--c-def);background:color-mix(in srgb,var(--c-def) 6%,var(--bg));border-radius:8px;padding:10px 16px}
+.def dt{font:700 var(--fs-body)/1.4 var(--sans);color:var(--c-def)}
+.def dd{margin:2px 0 0}
+.excard{padding:14px 18px}
+.excard .prob{margin:2px 0 8px}
+.excard .sol{border-top:1px dashed color-mix(in srgb,var(--c-ex) 35%,var(--line));margin:8px 0 0}
+.excard .sol summary{color:var(--c-ex)}
+.excard .steps li::before{color:var(--c-ex)}
+.ans{display:flex;gap:10px;align-items:baseline;margin-top:10px;padding:8px 12px;border-radius:6px;background:color-mix(in srgb,var(--c-ex) 12%,var(--bg))}
+.ans>span{flex:none;font:700 var(--fs-label) var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--c-ex)}
+.ans p{margin:0}
+details.fold{padding:4px 16px}details.fold>summary{color:var(--c);font-weight:650}
+details.fold[open]>summary{margin-bottom:6px}
+.sumbox .ticks{list-style:none;padding:0;margin:6px 0 0}
+.sumbox .ticks li{position:relative;padding-left:26px;margin:6px 0}
+.sumbox .ticks li::before{content:"✓";position:absolute;left:0;color:var(--acc);font-weight:700}
+.lt .check{border-top:1px solid var(--line)}
+@media (max-width:640px){.lt{font-size:16px}.lt .sec{padding-top:34px}.cbox,.def{padding:10px 12px}.lh2{font-size:20px}}
+.lt .steps{margin:8px 0 0}.lt .steps li{padding:4px 0;gap:12px}.lt .steps li p{margin:0}.lt .steps li::before{font-size:var(--fs-small);line-height:1.9}
+.lt .excard .prob p{margin:0 0 6px}
+.lt .runin{list-style:none;padding-left:0!important}
+.lt .runin li{position:relative;padding-left:20px;margin:8px 0}
+.lt .runin li::before{content:"";position:absolute;left:4px;top:.72em;width:6px;height:6px;border-radius:50%;background:var(--acc)}
+.cbox.brief{margin-top:18px}

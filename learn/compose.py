@@ -9,6 +9,7 @@ import re
 SPECS = {}          # subject -> list of ("sec", name) / ("ch", topic, name) / ("sub", dict)
 MOVED = {}          # old slug -> [new slugs]   (lets the apps carry completed lessons over)
 UNUSED = {}         # subject -> ["slug X3", ...] pieces of source lessons that no sub-chapter took
+DROPPED = {}        # subject -> pieces removed on purpose because another sub-chapter piece already covers them
 
 
 class Spec:
@@ -29,10 +30,15 @@ class Spec:
                                        analogy=analogy, widget=widget, hint=hint, new=new)))
 
 
-    def more(self, slug, take=(), **new):
-        """Add pieces or new material to a sub-chapter declared earlier."""
+    def more(self, slug, take=(), drop=(), **new):
+        """Add pieces or new material to a sub-chapter declared earlier; drop = [(source_slug, "S1 E2")] removes pieces
+        that repeat material already covered (they are reported as deliberately dropped, not as lost)."""
         d = next(it[1] for it in self.items if it[0] == "sub" and it[1]["slug"] == slug)
         d["take"] += list(take)
+        for src, toks in drop:
+            gone = set(toks.split())
+            d["take"] = [(s_, " ".join(t for t in p_.split() if not (s_ == src and t in gone))) for s_, p_ in d["take"]]
+            DROPPED.setdefault(self.subject, []).extend("%s %s" % (src, t) for t in gone)
         for f, v in new.items():
             d["new"][f] = list(d["new"].get(f, [])) + list(v)
 
@@ -65,7 +71,7 @@ def compose(LESSONS):
             no += 1
             l = dict(subject=subject, section=section, chapter=chname, ch_no=ch_no, no=no, slug=d["slug"], title=d["title"], topic=topic,
                      subs=d["subs"], key=d["key"], summary=d["summary"], widget=d["widget"] or "none", widget_hint=d["hint"],
-                     book=[], sections=[], examples=[], quick=[], traps=[], proofs=[], notes=[], credits=10, weight=4, sources=[])
+                     book=[], sections=[], examples=[], quick=[], traps=[], proofs=[], notes=[], defs=[], credits=10, weight=4, sources=[])
             for s_slug, picks in d["take"]:
                 s = src[s_slug]
                 l["sources"].append(s_slug)
@@ -83,7 +89,7 @@ def compose(LESSONS):
                 l["widget"], l["widget_hint"] = (ws[0], src[l["sources"][0]].get("widget_hint", "")) if ws and len(l["sources"]) == 1 else ("none", "")
             l["minutes"] = max(8, round(_words(l) / 150 + 2 * len(l["examples"]) + 3))
             out.append(l)
-        UNUSED[subject] = ["%s %s%d" % (s, k, i) for s, sl in src.items() for k, f in FIELD.items() for i in range(len(sl.get(f, []))) if (s, k, i) not in used]
+        UNUSED[subject] = ["%s %s%d" % (s, k, i) for s, sl in src.items() for k, f in FIELD.items() for i in range(len(sl.get(f, []))) if (s, k, i) not in used and "%s %s%d" % (s, k, i) not in DROPPED.get(subject, [])]
         new = {l["slug"] for l in out}
         for s in src:
             if s not in new:

@@ -25,6 +25,26 @@ def dump(path, obj):
         json.dump(obj, f, ensure_ascii=False, separators=(",", ":"))
 
 
+def _concepts(l, learn, typeset):
+    """Concept blocks in reading order: the long-form parts first; a reference section whose heading repeats a part's
+    heading is folded into that part as an 'In brief' box instead of appearing twice."""
+    tok = lambda h: set(re.findall(r"[a-z0-9]{3,}", h.lower())) - {"the", "and", "with", "you", "must", "know"}
+    out = [{"h": h, "html": str(learn.md(b)), "formulas": [], "call": []} for h, b in l.get("book", [])]
+    nb = len(out)
+    for s in l["sections"]:
+        sec = {"h": s["h"], "html": str(learn.md(s["md"])), "formulas": [[typeset(f[0]), f[1] if len(f) > 1 else ""] for f in s.get("formulas", [])],
+               "call": [[c[0], c[1], str(learn.md(c[2]))] for c in s.get("call", [])]}
+        t = tok(s["h"])
+        best = max(range(nb), key=lambda i: len(t & tok(out[i]["h"])) / max(1, len(t | tok(out[i]["h"]))), default=None)
+        if best is not None and t and len(t & tok(out[best]["h"])) / max(1, len(t | tok(out[best]["h"]))) >= .5:
+            out[best]["html"] += '<div class="cbox note brief"><span class="lbl">In brief</span>%s</div>' % sec["html"]
+            out[best]["formulas"] += sec["formulas"]
+            out[best]["call"] += sec["call"]
+        else:
+            out.append(sec)
+    return out
+
+
 def _pick(rng, pool, n):
     """n questions from pool, balanced by difficulty (30% easy, 50% medium, 20% hard) and spread over sub-topics."""
     by = {"easy": [], "medium": [], "hard": []}
@@ -150,6 +170,8 @@ def main():
             "topic": l["topic"], "subs": l.get("subs", []), "credits": l.get("credits", 20),"minutes": l["minutes"], "weight": l["weight"], "widget": l["widget"], "hint": l.get("widget_hint", ""),
             "key": str(learn.mdi(l.get("key", ""))),
             "analogy": [l["analogy"][0], l["analogy"][1], str(learn.md(l["analogy"][2]))] if l.get("analogy") else None,
+            "defs": [[t, str(learn.mdi(d))] for t, d in l.get("defs", [])],
+            "concepts": _concepts(l, learn, typeset),
             "book": [[h, str(learn.md(b))] for h, b in l.get("book", [])],
             "sections": [{"h": s["h"], "html": str(learn.md(s["md"])),
                           "formulas": [[typeset(f[0]), f[1] if len(f) > 1 else ""] for f in s.get("formulas", [])],
