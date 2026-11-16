@@ -44,13 +44,23 @@ V.learn = async () => {
   const sub = S().subject, sj = GP.subj(sub), ls = GP.lessonsOf(sub), f = S().tab.learn || 'all';
   if (!ls.length) return `<div class="page"><h1 class="h1">${esc(sj.name)}</h1><p class="mut" style="margin-top:var(--s2)">Lessons for this subject are on the way. You can already practise it.</p><p style="margin-top:var(--s2)"><a class="btn pri" href="#/practice">Go to practice →</a></p></div>`;
   const nl = nextLesson(sub), done = ls.filter(l => lessonDone(l.slug)).length;
-  const chapters = [...new Set(ls.map(l => l.ch_no))].map(n => ({n, name: ls.find(l => l.ch_no === n).chapter, ls: ls.filter(l => l.ch_no === n).filter(l => f === 'all' || (f === 'todo' ? !lessonDone(l.slug) : lessonDone(l.slug)))})).filter(c => c.ls.length);
-  return `<div class="page"><h1 class="h1">${esc(sj.name)}</h1><p class="mut" style="margin-top:var(--s1)">${ls.length} lessons · about ${Math.round(ls.reduce((a, l) => a + l.minutes, 0) / 60 * 10) / 10} hours · ${done} finished</p>
+  const keep = l => f === 'all' || (f === 'todo' ? !lessonDone(l.slug) : lessonDone(l.slug));
+  const chapters = [...new Set(ls.map(l => l.ch_no))].map(n => { const all = ls.filter(l => l.ch_no === n); return {n, name: all[0].chapter, section: all[0].section || '', all, ls: all.filter(keep)}; }).filter(c => c.ls.length);
+  const numbered = ls.some(l => l.section);
+  const lrow = (c, l) => `<a class="lrow" href="#/lesson/${l.slug}"><span class="dot ${lessonDone(l.slug) ? 'done' : ''}">${lessonDone(l.slug) ? '✓' : ''}</span>
+      <span><b>${numbered ? `<span class="num">${c.n}.${l.no}</span> ` : ''}${esc(l.title)}</b><span class="sm mut">${l.minutes} min${numbered ? '' : ' · ' + esc(l.topic)}${l.widget !== 'none' ? ' · interactive' : ''}</span></span>
+      <span class="btn sm ${nl && nl.slug === l.slug ? 'pri' : ''}">${lessonDone(l.slug) ? 'Read again' : nl && nl.slug === l.slug ? (done ? 'Continue' : 'Start') : 'Open'}</span></a>`;
+  const chap = c => { const d = c.all.filter(l => lessonDone(l.slug)).length;
+    return `<div class="chapter"><div class="row sp wrap" style="gap:var(--s1)"><div><div class="eyebrow">Chapter ${c.n} · ${c.all.length} sub-chapters</div><h3 class="chh">${esc(c.name)}</h3></div><span class="sm mut">${d}/${c.all.length} done</span></div>${c.ls.map(l => lrow(c, l)).join('')}</div>`; };
+  let body;
+  if (numbered) {
+    const secs = [...new Set(chapters.map(c => c.section))];
+    body = secs.map(sn => `<section class="lsec"><div class="eyebrow">Section ${[...new Set(ls.map(l => l.section))].indexOf(sn) + 1}</div><h2 class="h2">${esc(sn)}</h2>${chapters.filter(c => c.section === sn).map(chap).join('')}</section>`).join('');
+  } else body = chapters.map(c => `<div class="chapter"><div class="eyebrow">Chapter ${c.n} · ${esc(c.name)}</div>${c.ls.map(l => lrow(c, l)).join('')}</div>`).join('');
+  return `<div class="page"><h1 class="h1">${esc(sj.name)}</h1><p class="mut" style="margin-top:var(--s1)">${numbered ? new Set(ls.map(l => l.ch_no)).size + ' chapters · ' : ''}${ls.length} ${numbered ? 'sub-chapters' : 'lessons'} · about ${Math.round(ls.reduce((a, l) => a + l.minutes, 0) / 60 * 10) / 10} hours · ${done} finished</p>
    <div class="bar" style="margin-top:var(--s2)"><i style="width:${pct(done, ls.length)}%"></i></div>
    <div class="tabs">${[['all', 'All'], ['todo', 'To do'], ['done', 'Finished']].map(([k, n]) => `<button data-f="${k}" class="${f === k ? 'on' : ''}">${n}</button>`).join('')}</div>
-   ${chapters.map(c => `<div class="chapter"><div class="eyebrow">Chapter ${c.n} · ${esc(c.name)}</div>${c.ls.map(l => `<a class="lrow" href="#/lesson/${l.slug}"><span class="dot ${lessonDone(l.slug) ? 'done' : ''}">${lessonDone(l.slug) ? '✓' : ''}</span>
-      <span><b>${esc(l.title)}</b><span class="sm mut">${l.minutes} min · ${esc(l.topic)}${l.widget !== 'none' ? ' · interactive' : ''}</span></span>
-      <span class="btn sm ${nl && nl.slug === l.slug ? 'pri' : ''}">${lessonDone(l.slug) ? 'Read again' : nl && nl.slug === l.slug ? (done ? 'Continue' : 'Start') : 'Open'}</span></a>`).join('')}</div>`).join('') || '<p class="mut" style="margin-top:var(--s3)">Nothing here.</p>'}</div>`;
+   ${body || '<p class="mut" style="margin-top:var(--s3)">Nothing here.</p>'}</div>`;
 };
 GP.after = null;
 const learnAfter = v => $$('.tabs button', v).forEach(b => b.onclick = () => { S().tab.learn = b.dataset.f; GP.save(); GP.route(); });
@@ -71,10 +81,10 @@ async function lessonPractice(l) {
 V.lesson = async p => {
   const l = await GP.json('data/lesson/' + p[2] + '.json');
   if (S().subject !== l.subject) { S().subject = l.subject; GP.save(); GP.chrome(); }
-  const prac = await lessonPractice(l), secs = [];
+  const prac = await lessonPractice(l), secs = [], numbered = !!l.section, stest = (await GP.tests()).find(t => t.id === 'sub-' + l.slug);
   const sec = (id, h, body) => { secs.push([id, h]); return `<section class="sec" id="${id}"><h2 class="h2">${esc(h)}</h2>${body}</section>`; };
-  let html = `<div class="read"><i id="readbar"></i></div><div class="page wide"><div class="lesson"><article><div class="eyebrow">Chapter ${l.ch_no} · ${esc(l.chapter)} · ${l.minutes} min · GATE weight ${'★'.repeat(l.weight)}${'☆'.repeat(5 - l.weight)}</div>
-   <h1 class="h1" style="margin:var(--s1) 0 var(--s2)">${esc(l.title)}</h1><div class="tocm"><details><summary>Contents</summary><div id="tocm" class="stack" style="padding:var(--s1) 0"></div></details></div>`;
+  let html = `<div class="read"><i id="readbar"></i></div><div class="page wide"><div class="lesson"><article><div class="eyebrow">${numbered ? esc(l.section) + ' · ' : ''}Chapter ${l.ch_no} · ${esc(l.chapter)} · ${l.minutes} min · GATE weight ${'★'.repeat(l.weight)}${'☆'.repeat(5 - l.weight)}</div>
+   <h1 class="h1" style="margin:var(--s1) 0 var(--s2)">${numbered ? `<span class="num">${l.ch_no}.${l.no}</span> ` : ''}${esc(l.title)}</h1><div class="tocm"><details><summary>Contents</summary><div id="tocm" class="stack" style="padding:var(--s1) 0"></div></details></div>`;
   html += sec('s-idea', 'The idea in one line', `<div class="callout key"><span class="t">Key idea</span>${l.key}</div>` + (l.analogy ? `<div class="analogy"><span class="em">${l.analogy[0]}</span><div><b>${esc(l.analogy[1])}</b><div class="mut">${l.analogy[2]}</div></div></div>` : ''));
   if (l.book.length) html += sec('s-book', 'Learn it from scratch', `<p class="mut">Read this part top to bottom like a textbook chapter. Nothing is assumed — new terms are explained where they first appear.</p><div class="book">${l.book.map(b => `<h3 class="bk">${esc(b[0])}</h3>${b[1]}`).join('')}</div>`);
   l.sections.forEach((s, i) => { html += sec('s-' + (i + 1), s.h, s.html + s.formulas.map(f => `<div class="formula"><div class="texd" data-tex="${esc(f[0])}">${esc(f[0])}</div>${f[1] ? `<small>${esc(f[1])}</small>` : ''}</div>`).join('') + s.call.map(c => `<div class="callout ${c[0]}"><span class="t">${esc(c[1])}</span>${c[2]}</div>`).join('')); });
@@ -86,7 +96,7 @@ V.lesson = async p => {
   if (l.quick.length) html += sec('s-quick', 'Quick check', '<p class="mut">Instant questions to lock the idea in.</p>' + l.quick.map((q, i) => `<div class="check quick" data-i="${i}"><b>${q[0]}</b><div style="margin-top:var(--s1)">${q[1].map((o, k) => `<button class="opt" data-k="${k}"><span class="k">${LET[k]}</span><span>${esc(o)}</span></button>`).join('')}</div><div class="fbq"></div></div>`).join(''));
   html += sec('s-practice', 'GATE-level practice', prac.length ? prac.map((q, i) => `<div class="check" id="pq-${i}"></div>`).join('') : '<p class="mut">No practice questions for this topic yet.</p>');
   html += sec('s-sum', 'Summary — cheat sheet', `<ul>${l.summary.map(b => `<li>${b}</li>`).join('')}</ul>
-   <div class="fin"><div class="row sp wrap"><div><b>Finished this topic?</b><div class="mut sm">Mark it complete to earn ${l.credits || 20} credits.</div></div><button class="btn pri" id="complete">${lessonDone(l.slug) ? '✓ Completed' : 'Mark as complete'}</button></div></div>`);
+   ${stest ? `<div class="fin" style="margin-bottom:var(--s2)"><div class="row sp wrap"><div><b>Sub-chapter test</b><div class="mut sm">${stest.q.length} GATE-style questions · ${stest.m} min · timed, with negative marking${S().done[stest.id] ? ' · best ' + S().done[stest.id].best + ' / ' + S().done[stest.id].max : ''}</div></div><a class="btn" href="#/test/${stest.id}">${S().done[stest.id] ? 'Retake test' : 'Take the test'}</a></div></div>` : ''}<div class="fin"><div class="row sp wrap"><div><b>Finished this ${numbered ? 'sub-chapter' : 'topic'}?</b><div class="mut sm">Mark it complete to earn ${l.credits || 20} credits.</div></div><button class="btn pri" id="complete">${lessonDone(l.slug) ? '✓ Completed' : 'Mark as complete'}</button></div></div>`);
   const ls = GP.lessonsOf(l.subject), i = ls.findIndex(x => x.slug === l.slug), pv = ls[i - 1], nx = ls[i + 1];
   html += `<div class="pn">${pv ? `<a class="btn" href="#/lesson/${pv.slug}">← ${esc(pv.title)}</a>` : '<span></span>'}${nx ? `<a class="btn pri" href="#/lesson/${nx.slug}">Next: ${esc(nx.title)} →</a>` : ''}</div></article>
    <nav class="toc">${secs.map(s => `<a data-s="${s[0]}">${esc(s[1])}</a>`).join('')}</nav></div></div>`;
@@ -137,10 +147,17 @@ V.tests = async () => {
   const sub = S().subject, all = await GP.tests(), mine = all.filter(t => t.s === sub && (t.k === 'small' || t.k === 'sfull')), mocks = all.filter(t => t.k === 'full');
   const row = t => { const dn = S().done[t.id], rn = S().running[t.id], nq = t.q.length;
     return `<div class="trow"><div><b>${esc(t.ti)}</b><span class="sm mut">${nq} questions · ${t.m >= 60 ? (t.m / 60) + ' h' : t.m + ' min'}${dn ? ` · best ${dn.best} / ${dn.max}` : ''}${rn ? ' · in progress' : ''}</span></div><span></span><div class="acts"><a class="btn sm ${rn ? 'pri' : ''}" href="#/test/${t.id}">${rn ? 'Resume' : dn ? 'Retake' : 'Start'}</a></div></div>`; };
-  const hist = S().tests.slice().reverse().slice(0, 12);
+  const hist = S().tests.slice().reverse().slice(0, 12), ls = GP.lessonsOf(sub), st = all.filter(t => t.s === sub && ['sect', 'chap', 'sub'].includes(t.k));
+  let tree = '';
+  if (st.length && ls.some(l => l.section)) {
+    const secs = [...new Set(ls.map(l => l.section))];
+    tree = secs.map((sn, i) => { const sls = ls.filter(l => l.section === sn), chs = [...new Set(sls.map(l => l.ch_no))], stt = st.find(t => t.k === 'sect' && t.n === i + 1);
+      return `<section class="lsec"><div class="eyebrow">Section ${i + 1}</div><h2 class="h2">${esc(sn)}</h2>${stt ? row(stt) : ''}${chs.map(n => { const cls = sls.filter(l => l.ch_no === n), ct = st.find(t => t.k === 'chap' && t.t === cls[0].topic), subs = cls.map(l => st.find(t => t.id === 'sub-' + l.slug)).filter(Boolean), dn = subs.filter(t => S().done[t.id]).length;
+        return `<details class="tch"><summary><span><span class="eyebrow">Chapter ${n}</span><b>${esc(cls[0].chapter)}</b></span><span class="sm mut">${dn}/${subs.length} sub-chapter tests done</span></summary>${ct ? row(ct) : ''}${subs.map(row).join('')}</details>`; }).join('')}</section>`; }).join('');
+  }
   return `<div class="page"><h1 class="h1">Tests</h1>
    <label class="row" style="gap:12px;margin:var(--s3) 0;align-items:flex-start;cursor:pointer"><input type="checkbox" id="dry" ${S().dry ? 'checked' : ''} style="margin-top:6px;width:18px;height:18px"><span><b>Exam-day dry run</b><br><span class="mut sm">Hides topic and difficulty tags and the per-question timer, like the real exam.</span></span></label>
-   <div class="eyebrow">${esc(GP.subj(sub).name)} tests</div>${mine.map(row).join('') || '<p class="mut">No subject tests for this subject.</p>'}
+   ${tree ? `<p class="mut">Each section, chapter and sub-chapter has its own timed test. Open a chapter to see its tests.</p>${tree}<div class="eyebrow" style="margin-top:var(--s4)">Full ${esc(GP.subj(sub).name)} tests</div>` : `<div class="eyebrow">${esc(GP.subj(sub).name)} tests</div>`}${mine.map(row).join('') || '<p class="mut">No subject tests for this subject.</p>'}
    <div class="eyebrow" style="margin-top:var(--s4)">GATE CS full mocks · 65 questions · 3 hours</div>${mocks.map(row).join('')}
    <div class="eyebrow" style="margin:var(--s4) 0 var(--s1)">Past attempts</div>
    ${hist.map(h => `<a class="trow" href="#/result/${S().tests.indexOf(h)}"><div><b>${esc(h.title)}</b><span class="sm mut">${h.when}${h.dry ? ' · dry run' : ''}</span></div><span class="mono sm">${(+h.score).toFixed(2)} / ${h.max}</span><span class="link">Results →</span></a>`).join('') || '<p class="mut">None yet.</p>'}</div>`;

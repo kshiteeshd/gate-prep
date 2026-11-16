@@ -145,7 +145,7 @@ F.test = async (p, root) => {
   const dryNow = S().dry, qs = t.q.map(id => GP.Q(id));
   let R = S().running[t.id];
   const secs = [...new Set(t.sec)], multi = secs.length > 1, tm = qs.reduce((a, q) => a + q.m, 0);
-  const boot = () => { root.innerHTML = `<div class="page" style="max-width:680px"><div class="eyebrow">${t.k === 'full' ? 'Full GATE mock' : 'Subject test'}${R ? ' · resumed' : ''}</div><h1 class="h1" style="margin:var(--s1) 0">${esc(t.ti)}</h1>
+  const boot = () => { root.innerHTML = `<div class="page" style="max-width:680px"><div class="eyebrow">${({full: 'Full GATE mock', sect: 'Section test', chap: 'Chapter test', sub: 'Sub-chapter test'})[t.k] || 'Subject test'}${R ? ' · resumed' : ''}</div><h1 class="h1" style="margin:var(--s1) 0">${esc(t.ti)}</h1>
     <div class="score" style="margin:var(--s3) 0"><div><b>${qs.length}</b><span>questions</span></div><div><b>${tm}</b><span>marks</span></div><div><b>${t.m}</b><span>minutes</span></div></div>
     <ul style="padding-left:20px;display:grid;gap:6px"><li>${multi ? secs.map(s => `${secName(s)}: ${t.sec.filter(x => x === s).length}`).join(' · ') : 'Single section'}</li><li>MCQ: negative marking ⅓ for 1-mark and ⅔ for 2-mark questions. MSQ and NAT: none.</li><li>Answers save automatically. You can leave and resume — the clock keeps running.</li>${S().dry ? '<li><b>Dry run:</b> tags and the question timer are hidden, as in the real exam.</li>' : ''}</ul>
     <div class="row wrap" style="margin-top:var(--s3)"><button class="btn pri" id="go">${R ? 'Resume test' : 'Start test'} →</button><a class="btn" href="#/tests">Back</a></div></div>`; $('#go').onclick = start; };

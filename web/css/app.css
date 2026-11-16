@@ -298,3 +298,19 @@ table.t td{padding:8px;border-bottom:1px solid var(--line)}
 /* explanation notes: Concept / Method / Watch out */
 .fb p.note{margin:0 0 var(--s1)}
 .lab{display:block;font:700 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc);margin-bottom:1px}
+.lsec{margin-top:var(--s4)}
+.lsec>.h2{margin:2px 0 var(--s1)}
+.chh{font-size:1.05rem;font-weight:650;margin:2px 0 var(--s1)}
+.num{font-family:var(--mono);color:var(--mut);font-weight:600;margin-right:2px}
+.tch{border-bottom:1px solid var(--line);padding:var(--s1) 0}
+.tch>summary{display:flex;justify-content:space-between;align-items:center;gap:var(--s2);cursor:pointer;padding:var(--s1) 0;list-style:none}
+.tch>summary::-webkit-details-marker{display:none}
+.tch>summary .eyebrow{display:block}
+.tch[open]>summary{border-bottom:1px solid var(--line)}
+.tch>summary{color:var(--ink)}
+.tch>summary::before{content:none}
+.tch>summary>span:first-child{flex:1;min-width:0}
+.tch>summary>span:first-child b{display:block}
+.tch>summary>span:last-child{flex:none;text-align:right;max-width:40%}
+.tch>summary>span:last-child::after{content:" ▾";color:var(--mut)}
+.tch[open]>summary>span:last-child::after{content:" ▴"}

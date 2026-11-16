@@ -17,7 +17,7 @@ def _utext(u):
 def chapterize(LESSONS):
     if any(l.get("part") for l in LESSONS):
         return
-    parents = sorted((l for l in LESSONS if l["chapter"] not in HAND_CHAPTERS),
+    parents = sorted((l for l in LESSONS if l["chapter"] not in HAND_CHAPTERS and not l.get("section")),
                      key=lambda l: (l["subject"], l["ch_no"], l["no"]))
     children, split = [], set()
     for l in parents:
@@ -63,7 +63,7 @@ def chapterize(LESSONS):
         if l["slug"] in split:
             l["chapter"] = l["title"]
             l["no"] = 1
-    for subj in {l["subject"] for l in LESSONS}:
+    for subj in {l["subject"] for l in LESSONS if not l.get("section")}:
         order = []
         ls = [x for x in LESSONS if x["subject"] == subj]
         for l in sorted(ls, key=lambda x: (x["ch_no"], x["chapter"] in HAND_CHAPTERS, x["no"])):

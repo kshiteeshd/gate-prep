@@ -230,6 +230,17 @@ async function route() {
 }
 GP.route = route;
 
+/* lessons that were merged or split keep their completion: a finished old lesson marks the sub-chapters made from it */
+function migrateLessons() {
+  const live = new Set(GP.meta.lessons.map(l => l.slug)), moved = GP.meta.moved || {}; let n = 0;
+  Object.entries(S.lessons).forEach(([slug, v]) => {
+    if (!v || !v.done || live.has(slug)) return;
+    const base = slug.replace(/-(p\d+|review)$/, ''), to = moved[slug] || moved[base] || (live.has(base) ? [base] : []);
+    to.forEach(t => { const L = S.lessons[t] || (S.lessons[t] = {}); if (!L.done) { L.done = v.done; L.from = slug; n++; } });
+  });
+  if (n) save();
+}
+
 async function boot() {
   document.body.insertAdjacentHTML('afterbegin', `<div id="shell" class="shell"><aside class="rail" id="rail"></aside><div class="main"><header class="top">
     <button class="ghost" id="back" hidden>← Back</button><button class="ghost only-m" id="mSubj" title="Subject"></button><div class="crumbs" id="crumbs"></div>
@@ -240,6 +251,7 @@ async function boot() {
   await loadState(); applyPrefs();
   try { GP.meta = await J('data/meta.json'); } catch (e) { document.body.innerHTML = '<div class="page"><div class="err"><b>Content could not be loaded.</b><p class="mut">Check your connection and reload.</p></div></div>'; return; }
   if (!GP.subj(S.subject)) S.subject = 'ALGO';
+  migrateLessons();
   window.addEventListener('hashchange', route);
   if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !GP.desktop) navigator.serviceWorker.register('sw.js').catch(() => {});
   route();
