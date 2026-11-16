@@ -68,6 +68,11 @@ def load_all():
             importlib.import_module("learn." + m.name)
     from learn.compose import compose
     compose(LESSONS)
+    for m in sorted(pkgutil.iter_modules(__path__), key=lambda m: m.name):
+        if m.name.startswith("a_"):
+            importlib.import_module("learn." + m.name)
+    from learn.author import finalize
+    finalize(LESSONS)
     from learn.chapters import chapterize
     chapterize(LESSONS)
     LESSONS.sort(key=lambda l: (l["subject"], l["ch_no"], l["no"]))

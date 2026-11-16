@@ -85,3 +85,16 @@ The colours have lighter variants in the dark themes (Slate, Midnight) so they s
 2. `learn/s_<code>_more.py` adds missing material and records deliberate drops; `learn/s_<code>_defs.py` holds the definitions.
 3. `content/g_*.py` generators give every sub-topic its own question family with worked explanations.
 4. `python tools/build_pack.py`, `python tools/export_site.py`, `python tools/check_learn.py`.
+
+## 7. Authored sub-chapters (current method)
+
+Sub-chapters are written directly, one coherent lesson each (`learn/a_<code>_NN.py`, using `learn/author.py`), instead
+of being assembled from older lessons: stitched material produced repeated explanations and odd ordering.
+
+Within a lesson the parts run **idea → precise definitions → results (tables, formulas) → method → how GATE asks it**,
+so each fact appears once, in the place the reader needs it. The "How GATE asks this" part is a table of question
+types and the way in; a later pass (`a_<code>_z*.py`) adds one harder GATE-style example per lesson and short proofs
+of the key results (shown folded).
+
+Extra checks enforced by `tools/check_learn.py`: no sentence of 9+ words appears twice in a lesson, and every
+table cell is free of raw `|` characters (use ∣ for an absolute value or cardinality bar inside a table).

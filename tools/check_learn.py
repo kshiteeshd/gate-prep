@@ -86,6 +86,14 @@ def template_rules(l):
         for para in re.split(r"\n\s*\n", t):
             if not para.lstrip().startswith(("|", "-", "    ", "1.", "$$")) and wc(para) > 110 and len(re.findall(r"\*\*[^*]{2,48}?[:.]\*\*", para)) < 2:
                 E(l, "RULE paragraph of %d words (max 110): %s" % (wc(para), para.strip()[:50]))
+    seen = {}
+    for src, t in [("part", x["md"]) for x in l["sections"]] + [("example", e.problem + " " + " ".join(e.steps)) for e in l["examples"]]:
+        for sent in re.split(r"(?<=[.!?])\s+|\n+", re.sub(r"[*`$|]", "", t)):
+            key = re.sub(r"\W+", " ", sent.lower()).strip()
+            if len(key.split()) >= 9:
+                if key in seen:
+                    E(l, "RULE repeated sentence: %s" % sent.strip()[:60])
+                seen[key] = src
     if len(l["examples"]) < 3:
         E(l, "RULE fewer than 3 worked examples")
     titles = [e.title for e in l["examples"]]
