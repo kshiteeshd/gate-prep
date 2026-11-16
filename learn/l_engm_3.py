@@ -51,7 +51,7 @@ def simpson(f, a, b, n=20000):
 
 
 # ======================================================================================================
-lesson(subject=S, chapter="Linear Algebra", ch_no=7, no=1, slug="engm-matrices-determinants", title="Matrices, Determinants & Rank",
+lesson(subject=S, chapter="Linear Algebra", ch_no=7, no=1, slug="engm-matrices-determinants", title="1 · Matrices, determinants and rank at a glance",
        topic="Matrices & Determinants", minutes=22, weight=4, widget="matrix",
        widget_hint="Edit any 2×2 or 3×3 matrix and watch the determinant, trace, rank, inverse and eigenvalues update. Try a matrix whose rows are dependent.",
        key="The determinant tells you whether a square matrix is invertible (det ≠ 0), scales volumes, and obeys a short list of rules — det(AB) = det A·det B, det(kA) = kⁿ det A, and row swaps flip the sign. The rank counts independent rows and decides how many solutions a system has.",
@@ -120,7 +120,7 @@ def _char_roots_2(M):
     return sorted([(tr + r) / 2, (tr - r) / 2], reverse=True)
 
 
-lesson(subject=S, chapter="Linear Algebra", ch_no=7, no=2, slug="engm-linear-systems-eigen", title="Linear Systems & Eigenvalues",
+lesson(subject=S, chapter="Linear Algebra", ch_no=7, no=2, slug="engm-linear-systems-eigen", title="2 · Linear systems and eigenvalues at a glance",
        topic="Linear Equations & Eigenvalues", minutes=22, weight=5, widget="matrix",
        widget_hint="Enter a symmetric matrix and check that Σλ equals the trace and Πλ equals the determinant. Make a row a multiple of another to see 0 become an eigenvalue.",
        key="A system Ax = b is solved by comparing rank(A) with rank([A|b]); eigenvalues λ satisfy det(A − λI) = 0, their sum is the trace and their product is the determinant — the two facts GATE uses over and over.",

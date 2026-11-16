@@ -2,7 +2,7 @@
 examples, quick checks and practice) and a review. Chapters written by hand lesson by lesson are left untouched."""
 import re
 
-HAND_CHAPTERS = {"Binary Trees, BST & AVL", "Dynamic Programming"}
+HAND_CHAPTERS = {"Binary Trees, BST & AVL", "Dynamic Programming", "Linear Algebra"}
 _STOP = set("the and for that with this from are was were not but all any can has have its into than then them they their there what when which will your you one two out per also each both only over such more most some very just like".split())
 
 
